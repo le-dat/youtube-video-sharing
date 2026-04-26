@@ -11,6 +11,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
     "@tailwindcss/vite": "^4.2.4",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.11",
@@ -20,8 +22,13 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.5",
+    "@types/react": "^19.2.14",
     "axios": "^1.15.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.14.2",
+    "socket.io-client": "^4.8.3",
     "zustand": "^5.0.12"
   }
 }

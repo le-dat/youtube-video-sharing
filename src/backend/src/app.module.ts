@@ -6,6 +6,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuardImpl } from './common/guards/throttler.guard';
 import { HealthModule } from './health/health.module';
 import { RedisModule } from './config/redis.module';
+import { UsersModule } from './users/users.module';
+import { YoutubeModule } from './youtube/youtube.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -61,6 +64,9 @@ import { RedisModule } from './config/redis.module';
     ]),
     HealthModule,
     RedisModule,
+    UsersModule,
+    YoutubeModule,
+    AuthModule,
   ],
   providers: [
     {

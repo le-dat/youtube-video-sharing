@@ -12,22 +12,43 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  // Enable graceful shutdown
+  app.enableShutdownHooks();
+
   // Security headers
   app.use(helmet());
 
-  // Request logging
-  app.use(morgan('combined'));
+  // Request logging - use 'dev' format for better performance than 'combined'
+  app.use(morgan('dev'));
 
   // Parse cookies for auth
   app.use(cookieParser());
 
-  // Enable CORS with credentials for cookie-based auth
-  app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN') ?? '',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
+  // CORS - validate origin is a proper URL or array of URLs in production
+  const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+  if (isProduction) {
+    if (!corsOrigin || corsOrigin === '') {
+      throw new Error(
+        'CORS_ORIGIN environment variable must be set in production',
+      );
+    }
+    app.enableCors({
+      origin: corsOrigin,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
+  } else {
+    // In development, allow any origin but respect credentials
+    app.enableCors({
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    });
+  }
 
   // Global prefix
   app.setGlobalPrefix('api');

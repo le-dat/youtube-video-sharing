@@ -5,6 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuardImpl } from './common/guards/throttler.guard';
 import { HealthModule } from './health/health.module';
+import { RedisModule } from './config/redis.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { HealthModule } from './health/health.module';
       },
     ]),
     HealthModule,
+    RedisModule,
   ],
   providers: [
     {

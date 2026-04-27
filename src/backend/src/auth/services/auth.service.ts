@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../users/users.service';
 import { RedisTokenService } from './redis-token.service';
 import { CreateUserDto } from '../../users/dto/user.dto';
-import { LoginDto } from '../dto/auth.dto';
+import type { LoginDto } from '../dto/auth.dto';
 
 export interface TokenPair {
   accessToken: string;
@@ -62,30 +62,44 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
+    const accessSecret = this.configService.get('JWT_ACCESS_SECRET');
+    if (!accessSecret) {
+      throw new Error('JWT_ACCESS_SECRET is not configured');
+    }
+
+    const refreshSecret = this.configService.get('JWT_REFRESH_SECRET');
+    if (!refreshSecret) {
+      throw new Error('JWT_REFRESH_SECRET is not configured');
+    }
+
+    let payload: { sub: string };
     try {
-      const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      payload = this.jwtService.verify(refreshToken, {
+        secret: refreshSecret,
       });
-
-      const isValid = await this.redisTokenService.isRefreshTokenValid(
-        refreshToken,
-      );
-      if (!isValid) {
-        throw new UnauthorizedException('Refresh token has been revoked');
+    } catch (err) {
+      if (err instanceof Error && err.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Refresh token has expired');
       }
-
-      const accessToken = this.jwtService.sign(
-        { sub: payload.sub },
-        {
-          secret: this.configService.get('JWT_ACCESS_SECRET'),
-          expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION'),
-        },
-      );
-
-      return { accessToken };
-    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
+
+    const isValid = await this.redisTokenService.isRefreshTokenValid(
+      refreshToken,
+    );
+    if (!isValid) {
+      throw new UnauthorizedException('Refresh token has been revoked');
+    }
+
+    const accessToken = this.jwtService.sign(
+      { sub: payload.sub },
+      {
+        secret: accessSecret,
+        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
+      },
+    );
+
+    return { accessToken };
   }
 
   async logout(refreshToken: string) {

@@ -16,9 +16,12 @@ export class RedisTokenService {
     expiresInSeconds: number,
   ): Promise<void> {
     const tokenHash = this.hashToken(token);
-    await this.redisService
-      .getClient()
-      .setex(`refresh_token:${tokenHash}`, expiresInSeconds, userId);
+    const client = this.redisService.getClient();
+    const pipeline = client.pipeline();
+    pipeline.setex(`refresh_token:${tokenHash}`, expiresInSeconds, userId);
+    pipeline.sadd(`user_tokens:${userId}`, tokenHash);
+    pipeline.expire(`user_tokens:${userId}`, expiresInSeconds);
+    await pipeline.exec();
   }
 
   async isRefreshTokenValid(token: string): Promise<boolean> {
@@ -31,7 +34,16 @@ export class RedisTokenService {
 
   async revokeRefreshToken(token: string): Promise<void> {
     const tokenHash = this.hashToken(token);
-    await this.redisService.getClient().del(`refresh_token:${tokenHash}`);
+    const userId = await this.redisService
+      .getClient()
+      .get(`refresh_token:${tokenHash}`);
+
+    const pipeline = this.redisService.getClient().pipeline();
+    pipeline.del(`refresh_token:${tokenHash}`);
+    if (userId) {
+      pipeline.srem(`user_tokens:${userId}`, tokenHash);
+    }
+    await pipeline.exec();
   }
 
   async revokeAllUserTokens(userId: string): Promise<void> {

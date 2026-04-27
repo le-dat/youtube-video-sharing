@@ -9,6 +9,7 @@ import { RedisModule } from './config/redis.module';
 import { UsersModule } from './users/users.module';
 import { YoutubeModule } from './youtube/youtube.module';
 import { AuthModule } from './auth/auth.module';
+import { VideosModule } from './videos/videos.module';
 
 @Module({
   imports: [
@@ -31,6 +32,8 @@ import { AuthModule } from './auth/auth.module';
             'DATABASE_NAME',
             'DATABASE_USER',
             'DATABASE_PASSWORD',
+            'JWT_ACCESS_SECRET',
+            'JWT_REFRESH_SECRET',
           ];
           for (const varName of requiredVars) {
             if (!configService.get(varName)) {
@@ -67,6 +70,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     YoutubeModule,
     AuthModule,
+    VideosModule,
   ],
   providers: [
     {

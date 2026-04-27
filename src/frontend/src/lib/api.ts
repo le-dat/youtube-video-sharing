@@ -1,23 +1,20 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 
 export const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = '/login';
-    }
     return Promise.reject(error);
-  }
+  },
 );
 
 export interface User {
@@ -40,34 +37,28 @@ export interface Video {
     id: string;
     username: string;
   };
-  user_vote: 'up' | 'down' | null;
+  user_vote: "up" | "down" | null;
   created_at: string;
 }
 
 export const authApi = {
   register: (username: string, email: string, password: string) =>
-    api.post('/auth/register', { username, email, password }),
+    api.post("/auth/register", { username, email, password }),
 
-  login: (email: string, password: string) =>
-    api.post('/auth/login', { email, password }),
+  login: (email: string, password: string) => api.post("/auth/login", { email, password }),
 
-  logout: () =>
-    api.delete('/auth/logout'),
+  logout: () => api.delete("/auth/logout"),
 
-  me: () =>
-    api.get('/auth/me'),
+  me: () => api.get("/auth/me"),
 };
 
 export const videosApi = {
-  list: (page = 1) =>
-    api.get('/videos', { params: { page } }),
+  list: (page = 1) => api.get("/videos", { params: { page } }),
 
-  show: (id: string) =>
-    api.get(`/videos/${id}`),
+  show: (id: string) => api.get(`/videos/${id}`),
 
-  create: (youtubeUrl: string) =>
-    api.post('/videos', { youtube_url: youtubeUrl }),
+  create: (youtubeUrl: string) => api.post("/videos", { youtube_url: youtubeUrl }),
 
-  vote: (videoId: string, voteType: 'up' | 'down') =>
+  vote: (videoId: string, voteType: "up" | "down") =>
     api.post(`/videos/${videoId}/vote`, { vote_type: voteType }),
 };

@@ -13,26 +13,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // Swagger documentation
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('YouTube Sharing API')
-    .setDescription(
-      'API for sharing YouTube videos with real-time notifications',
-    )
-    .setVersion('1.0')
-    .addCookieAuth(
-      'accessToken',
-      { type: 'apiKey', in: 'cookie' },
-      'accessToken',
-    )
-    .addCookieAuth(
-      'refreshToken',
-      { type: 'apiKey', in: 'cookie' },
-      'refreshToken',
-    )
-    .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  // Global prefix
+  app.setGlobalPrefix('api');
+
+  // API versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
 
   // Enable graceful shutdown
   app.enableShutdownHooks();
@@ -70,14 +58,26 @@ async function bootstrap() {
     });
   }
 
-  // Global prefix
-  app.setGlobalPrefix('api');
-
-  // API versioning
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  // Swagger documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('YouTube Sharing API')
+    .setDescription(
+      'API for sharing YouTube videos with real-time notifications',
+    )
+    .setVersion('1.0')
+    .addCookieAuth(
+      'accessToken',
+      { type: 'apiKey', in: 'cookie' },
+      'accessToken',
+    )
+    .addCookieAuth(
+      'refreshToken',
+      { type: 'apiKey', in: 'cookie' },
+      'refreshToken',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document);
 
   // Global validation pipe
   app.useGlobalPipes(

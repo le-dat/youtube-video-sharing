@@ -1,24 +1,18 @@
-import { Injectable, ExecutionContext, Inject } from '@nestjs/common';
-import {
-  ThrottlerGuard as NestThrottlerGuard,
-  InjectThrottlerStorage,
-  getOptionsToken,
-} from '@nestjs/throttler';
+import { Injectable, ExecutionContext } from '@nestjs/common';
+import { ThrottlerGuard as NestThrottlerGuard } from '@nestjs/throttler';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import type {
-  ThrottlerModuleOptions,
-  ThrottlerStorage,
-} from '@nestjs/throttler';
 
 @Injectable()
 export class ThrottlerGuardImpl extends NestThrottlerGuard {
   constructor(
-    @Inject(getOptionsToken()) opts: ThrottlerModuleOptions,
-    @InjectThrottlerStorage() storage: ThrottlerStorage,
+    options: any,
+
+    storage: any,
     reflector: Reflector,
   ) {
-    super(opts, storage, reflector);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    super(options, storage, reflector);
   }
 
   protected async shouldSkip(context: ExecutionContext): Promise<boolean> {

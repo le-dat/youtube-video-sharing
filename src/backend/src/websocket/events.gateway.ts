@@ -62,23 +62,16 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private extractToken(client: Socket): string | null {
-    // 1. Try to extract from cookies
-    const cookieHeader = client.handshake.headers.cookie;
+    const authToken = client.handshake.auth?.token as string | undefined;
+    if (authToken) return authToken;
+
+    const cookieHeader = client.handshake.headers?.cookie;
     if (cookieHeader) {
-      const accessToken = cookieHeader
-        .split(';')
-        .find((c) => c.trim().startsWith('accessToken='))
-        ?.split('=')[1];
-      if (accessToken) return accessToken;
+      const match = cookieHeader.match(/accessToken=([^;]+)/);
+      if (match) return match[1];
     }
 
-    // 2. Fallback to handshake auth or authorization header
-    const authToken = client.handshake.auth?.token as string | undefined;
-    const bearerToken = client.handshake.headers?.authorization?.replace(
-      'Bearer ',
-      '',
-    );
-    return authToken || bearerToken || null;
+    return null;
   }
 
   private addUserSocket(userId: string, socketId: string) {

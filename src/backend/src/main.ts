@@ -40,15 +40,15 @@ async function bootstrap() {
   // Security headers
   app.use(helmet());
 
-  // Request logging - use 'dev' format for better performance than 'combined'
-  app.use(morgan('dev'));
-
-  // Parse cookies for auth
-  app.use(cookieParser());
-
   // CORS - validate origin is a proper URL or array of URLs in production
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
   const isProduction = configService.get<string>('NODE_ENV') === 'production';
+
+  // Request logging - 'dev' for dev (readable), 'combined' for production (structured)
+  app.use(morgan(isProduction ? 'combined' : 'dev'));
+
+  // Parse cookies for auth
+  app.use(cookieParser());
 
   if (isProduction) {
     if (!corsOrigin || corsOrigin === '') {
@@ -60,7 +60,6 @@ async function bootstrap() {
       origin: corsOrigin,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
     });
   } else {
     // In development, allow any origin but respect credentials
@@ -68,7 +67,6 @@ async function bootstrap() {
       origin: true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
     });
   }
 

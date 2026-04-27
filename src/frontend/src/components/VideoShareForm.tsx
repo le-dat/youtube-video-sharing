@@ -27,9 +27,9 @@ export function VideoShareForm() {
     }
 
     try {
-      const video = await shareVideo(youtubeUrl);
+      await shareVideo(youtubeUrl);
       toast.success('Video shared successfully!');
-      navigate(`/video/${video.id}`);
+      navigate(`/`);
     } catch {
       toast.error(error || 'Failed to share video');
     }

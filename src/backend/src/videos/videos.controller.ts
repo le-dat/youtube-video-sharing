@@ -93,7 +93,7 @@ export class VideosController {
       sharedById: userId,
     });
 
-    return { data: this.videosService.toResponseDto(video, null) };
+    return this.videosService.toResponseDto(video, null);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -123,11 +123,9 @@ export class VideosController {
     const counts = await this.voteCountService.getVoteCounts(videoId);
 
     return {
-      data: {
-        video: {
-          upvote_count: counts.upvoteCount,
-          downvote_count: counts.downvoteCount,
-        },
+      video: {
+        upvote_count: counts.upvoteCount,
+        downvote_count: counts.downvoteCount,
       },
     };
   }

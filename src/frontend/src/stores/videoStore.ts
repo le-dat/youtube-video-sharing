@@ -65,10 +65,16 @@ export const useVideoStore = create<VideoState>()(
         try {
           const data = await videosApi.create(youtubeUrl);
           const newVideo = data;
-          set((state) => ({
-            videos: [newVideo, ...state.videos],
-            isLoading: false,
-          }));
+          
+          set((state) => {
+            const exists = state.videos.some((v) => v.id === newVideo.id);
+            if (exists) return { isLoading: false };
+            return {
+              videos: [newVideo, ...state.videos],
+              isLoading: false,
+            };
+          });
+          
           return newVideo;
         } catch (err: any) {
           set({
@@ -125,9 +131,13 @@ export const useVideoStore = create<VideoState>()(
       },
 
       prependVideo: (video: Video) => {
-        set((state) => ({
-          videos: [video, ...state.videos],
-        }));
+        set((state) => {
+          const exists = state.videos.some((v) => v.id === video.id);
+          if (exists) return state;
+          return {
+            videos: [video, ...state.videos],
+          };
+        });
       },
 
       updateVoteCount: (videoId: string, upvoteCount: number, downvoteCount: number) => {

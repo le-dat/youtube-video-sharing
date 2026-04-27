@@ -81,8 +81,8 @@ describe('UsersService', () => {
 
     it('should hash the password before saving', async () => {
       repository.findOne.mockResolvedValue(null);
-      repository.create.mockImplementation((dto) => dto);
-      repository.save.mockImplementation((user) => Promise.resolve(user));
+      repository.create.mockImplementation((dto) => dto as any);
+      repository.save.mockImplementation((user) => Promise.resolve(user as any));
 
       const result = await service.create(createUserDto);
 

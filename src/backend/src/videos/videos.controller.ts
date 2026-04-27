@@ -114,17 +114,19 @@ export class VideosController {
     const video = await this.videosService.findById(videoId);
     if (!video) throw new NotFoundException('Video not found');
 
-    const result = await this.voteCountService.recordVote(
-      videoId,
+    await this.voteCountService.recordVote(
       userId,
+      videoId,
       voteType as VoteType,
     );
+
+    const counts = await this.voteCountService.getVoteCounts(videoId);
 
     return {
       data: {
         video: {
-          upvote_count: result.upvoteCount,
-          downvote_count: result.downvoteCount,
+          upvote_count: counts.upvoteCount,
+          downvote_count: counts.downvoteCount,
         },
       },
     };

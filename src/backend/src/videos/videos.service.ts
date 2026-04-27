@@ -14,7 +14,7 @@ interface VideoCreateData {
   sharedById: string;
 }
 
-interface VideoResponse {
+export interface VideoResponse {
   id: string;
   youtube_id: string;
   title: string;

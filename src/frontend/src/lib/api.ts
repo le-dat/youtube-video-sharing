@@ -23,22 +23,25 @@ api.interceptors.response.use(
 
     // If error is 401 and not already retrying
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+      const isAuthPath = originalRequest.url?.includes("/auth/login") || originalRequest.url?.includes("/auth/register");
+      
+      if (!isAuthPath) {
+        originalRequest._retry = true;
 
-      try {
-        // Attempt to refresh the token
-        await axios.post(
-          `${API_BASE}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
+        try {
+          await axios.post(
+            `${API_BASE}/auth/refresh`,
+            {},
+            { withCredentials: true }
+          );
 
-        // Retry the original request
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, we could trigger a logout or just reject
-        // For now, let the error propagate so the store can handle it
-        return Promise.reject(refreshError);
+          // Retry the original request
+          return api(originalRequest);
+        } catch (refreshError) {
+          // If refresh fails, prioritize showing the original error
+          // that triggered the refresh attempt.
+          return Promise.reject(error);
+        }
       }
     }
 

@@ -53,8 +53,8 @@ export function VideoCard({ video, isLoading, onVote }: VideoCardProps) {
               className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
                 video.user_vote === 'up'
                   ? 'bg-success text-surface opacity-70 cursor-not-allowed'
-                  : 'bg-surface text-text-primary hover:bg-success hover:text-surface'
-              } ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  : `bg-surface text-text-primary ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-success hover:text-surface'}`
+              }`}
               title={!onVote ? "Login to like" : (video.user_vote === 'up' ? "You liked this" : "Like")}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,8 +69,8 @@ export function VideoCard({ video, isLoading, onVote }: VideoCardProps) {
               className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
                 video.user_vote === 'down'
                   ? 'bg-danger text-surface opacity-70 cursor-not-allowed'
-                  : 'bg-surface text-text-primary hover:bg-danger hover:text-surface'
-              } ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  : `bg-surface text-text-primary ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-danger hover:text-surface'}`
+              }`}
               title={!onVote ? "Login to dislike" : (video.user_vote === 'down' ? "You disliked this" : "Dislike")}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

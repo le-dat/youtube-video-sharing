@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { useVideoStore } from "../stores/videoStore";
-import { useAuthStore } from "../stores/authStore";
 import toast from "react-hot-toast";
+import { Link, useParams } from "react-router-dom";
+import { BackButton } from "../components/BackButton";
 import { ROUTES } from "../constants/routes";
+import { useAuthStore } from "../stores/authStore";
+import { useVideoStore } from "../stores/videoStore";
 
 export function VideoDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { currentVideo, fetchVideo, vote, isLoading, error } = useVideoStore();
   const { isAuthenticated } = useAuthStore();
   const [isVoting, setIsVoting] = useState(false);
@@ -62,24 +62,11 @@ export function VideoDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div>
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center text-text-secondary hover:text-text-primary font-bold"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Back
-        </button>
+      <div className="mb-6">
+        <BackButton />
       </div>
 
-      <div className="bg-surface mt-6 border-3 border-text-primary overflow-hidden shadow-neo">
+      <div className="bg-surface border-3 border-text-primary overflow-hidden shadow-neo">
         <div className="aspect-video bg-black">
           <iframe
             src={embedUrl}
@@ -91,13 +78,17 @@ export function VideoDetailPage() {
         </div>
 
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-text-primary mb-4">{currentVideo.title}</h1>
+          <h1 className="text-2xl font-bold text-text-primary mb-4">
+            {currentVideo.title}
+          </h1>
 
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-text-secondary">
                 Shared by{" "}
-                <span className="text-secondary font-bold">{currentVideo.shared_by.username}</span>
+                <span className="text-secondary font-bold">
+                  {currentVideo.shared_by.username}
+                </span>
               </span>
               <span className="text-text-secondary font-mono text-sm">
                 {new Date(currentVideo.created_at).toLocaleDateString()}
@@ -153,8 +144,12 @@ export function VideoDetailPage() {
 
           {currentVideo.description && (
             <div className="mt-6">
-              <h3 className="text-sm font-bold text-text-primary mb-2">Description</h3>
-              <p className="text-text-secondary whitespace-pre-wrap">{currentVideo.description}</p>
+              <h3 className="text-sm font-bold text-text-primary mb-2">
+                Description
+              </h3>
+              <p className="text-text-secondary whitespace-pre-wrap">
+                {currentVideo.description}
+              </p>
             </div>
           )}
 

@@ -1,8 +1,13 @@
 import { VideoShareForm } from '../components/VideoShareForm';
+import { BackButton } from '../components/BackButton';
 
 export function SharePage() {
   return (
     <div className="max-w-2xl mx-auto">
+      <div className="mb-6">
+        <BackButton />
+      </div>
+
       <div className="bg-surface border-3 border-text-primary p-8 shadow-neo">
         <h1 className="text-2xl font-bold text-text-primary mb-2">Share a YouTube Video</h1>
         <p className="text-text-secondary mb-6">

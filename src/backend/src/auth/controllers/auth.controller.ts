@@ -12,6 +12,13 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiCookieAuth,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -19,6 +26,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { CreateUserDto } from '../../users/dto/user.dto';
 import type { LoginDto } from '../dto/auth.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,6 +36,9 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, description: 'User registered successfully' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
   async register(
     @Body() dto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
@@ -40,6 +51,9 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -52,6 +66,9 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiCookieAuth('refreshToken')
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
   async refresh(
     @Req() req: { cookies?: Record<string, string> },
     @Res({ passthrough: true }) res: Response,
@@ -70,6 +87,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout and revoke refresh token' })
+  @ApiCookieAuth('accessToken')
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
   async logout(
     @Req() req: { cookies?: Record<string, string> },
     @Res({ passthrough: true }) res: Response,
@@ -87,6 +107,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiCookieAuth('accessToken')
+  @ApiResponse({ status: 200, description: 'User profile' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(@CurrentUser() userId: string) {
     return this.authService.getUser(userId);
   }

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -11,6 +12,27 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  // Swagger documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('YouTube Sharing API')
+    .setDescription(
+      'API for sharing YouTube videos with real-time notifications',
+    )
+    .setVersion('1.0')
+    .addCookieAuth(
+      'accessToken',
+      { type: 'apiKey', in: 'cookie' },
+      'accessToken',
+    )
+    .addCookieAuth(
+      'refreshToken',
+      { type: 'apiKey', in: 'cookie' },
+      'refreshToken',
+    )
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document);
 
   // Enable graceful shutdown
   app.enableShutdownHooks();

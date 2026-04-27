@@ -27,9 +27,9 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await authApi.login(email, password);
+          const data = await authApi.login(email, password);
           set({
-            user: response.data.user,
+            user: data.user,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -45,9 +45,9 @@ export const useAuthStore = create<AuthState>()(
       register: async (username: string, email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await authApi.register(username, email, password);
+          const data = await authApi.register(username, email, password);
           set({
-            user: response.data.user,
+            user: data.user,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -77,9 +77,9 @@ export const useAuthStore = create<AuthState>()(
 
       checkAuth: async () => {
         try {
-          const response = await authApi.me();
+          const data = await authApi.me();
           set({
-            user: response.data,
+            user: data,
             isAuthenticated: true,
           });
         } catch {

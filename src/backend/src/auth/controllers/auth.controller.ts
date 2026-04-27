@@ -112,7 +112,7 @@ export class AuthController {
   @ApiCookieAuth('accessToken')
   @ApiResponse({ status: 200, description: 'User profile' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProfile(@CurrentUser() userId: string) {
+  async getProfile(@CurrentUser('id') userId: string) {
     return this.authService.getUser(userId);
   }
 

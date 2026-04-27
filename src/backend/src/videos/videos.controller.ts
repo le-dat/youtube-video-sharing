@@ -50,7 +50,7 @@ export class VideosController {
   @ApiResponse({ status: 404, description: 'Video not found' })
   async show(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() userId?: string,
+    @CurrentUser('id') userId?: string,
   ) {
     const video = await this.videosService.findById(id);
     if (!video) throw new NotFoundException('Video not found');
@@ -70,7 +70,7 @@ export class VideosController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async share(
     @Body() dto: ShareVideoDto,
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
   ) {
     const videoId = this.youtubeService.extractVideoId(dto.youtubeUrl);
     if (!videoId) {
@@ -105,7 +105,7 @@ export class VideosController {
   async vote(
     @Param('id', ParseUUIDPipe) videoId: string,
     @Body('vote_type') voteType: string,
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
   ) {
     if (voteType !== VoteType.UP && voteType !== VoteType.DOWN) {
       throw new BadRequestException('vote_type must be "up" or "down"');

@@ -6,11 +6,6 @@ export const CurrentUser = createParamDecorator(
       .switchToHttp()
       .getRequest<{ user?: Record<string, unknown> }>();
     const user = request.user;
-
-    if (data) {
-      return user?.[data];
-    }
-
-    return user;
+    return data ? user?.[data] : user;
   },
 );

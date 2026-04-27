@@ -11,7 +11,13 @@ export const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the response follows our standard wrapper, unwrap it
+    if (response.data && response.data.success === true && "data" in response.data) {
+      return response.data.data;
+    }
+    return response.data;
+  },
   (error) => {
     return Promise.reject(error);
   },
@@ -41,24 +47,37 @@ export interface Video {
   created_at: string;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    current_page: number;
+    total_pages: number;
+    total_items: number;
+    items_per_page: number;
+  };
+}
+
 export const authApi = {
-  register: (username: string, email: string, password: string) =>
+  register: (username: string, email: string, password: string): Promise<{ user: User }> =>
     api.post("/auth/register", { username, email, password }),
 
-  login: (email: string, password: string) => api.post("/auth/login", { email, password }),
+  login: (email: string, password: string): Promise<{ user: User }> => 
+    api.post("/auth/login", { email, password }),
 
-  logout: () => api.post("/auth/logout"),
+  logout: (): Promise<void> => api.post("/auth/logout"),
 
-  me: () => api.get("/auth/me"),
+  me: (): Promise<User> => api.get("/auth/me"),
 };
 
 export const videosApi = {
-  list: (page = 1) => api.get("/videos", { params: { page } }),
+  list: (page = 1): Promise<PaginatedResponse<Video>> => 
+    api.get("/videos", { params: { page } }),
 
-  show: (id: string) => api.get(`/videos/${id}`),
+  show: (id: string): Promise<Video> => api.get(`/videos/${id}`),
 
-  create: (youtubeUrl: string) => api.post("/videos", { youtube_url: youtubeUrl }),
+  create: (youtubeUrl: string): Promise<Video> => 
+    api.post("/videos", { youtube_url: youtubeUrl }),
 
-  vote: (videoId: string, voteType: "up" | "down") =>
+  vote: (videoId: string, voteType: "up" | "down"): Promise<{ video: { upvote_count: number, downvote_count: number } }> =>
     api.post(`/videos/${videoId}/vote`, { vote_type: voteType }),
 };

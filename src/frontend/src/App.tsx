@@ -78,7 +78,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="bottom-right" />
       <div className="min-h-screen bg-surface">
         <Navbar />
         <main className="container mx-auto px-4 py-6">

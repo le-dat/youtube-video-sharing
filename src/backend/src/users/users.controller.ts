@@ -11,7 +11,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  async getProfile(@CurrentUser() userId: string) {
+  async getProfile(@CurrentUser('id') userId: string) {
     const user = await this.usersService.findById(userId);
     if (!user) throw new NotFoundException('User not found');
     return this.usersService.toResponseDto(user);

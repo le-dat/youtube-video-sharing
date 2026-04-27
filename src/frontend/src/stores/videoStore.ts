@@ -32,11 +32,11 @@ export const useVideoStore = create<VideoState>()(
       fetchVideos: async (page = 1) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await videosApi.list(page);
+          const data = await videosApi.list(page);
           set({
-            videos: page === 1 ? response.data.data : [...get().videos, ...response.data.data],
-            page: response.data.pagination.current_page,
-            totalPages: response.data.pagination.total_pages,
+            videos: page === 1 ? data.data : [...get().videos, ...data.data],
+            page: data.pagination.current_page,
+            totalPages: data.pagination.total_pages,
             isLoading: false,
           });
         } catch (err: any) {
@@ -50,8 +50,8 @@ export const useVideoStore = create<VideoState>()(
       fetchVideo: async (id: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await videosApi.show(id);
-          set({ currentVideo: response.data.data, isLoading: false });
+          const data = await videosApi.show(id);
+          set({ currentVideo: data, isLoading: false });
         } catch (err: any) {
           set({
             error: err.response?.data?.error || 'Failed to fetch video',
@@ -63,8 +63,8 @@ export const useVideoStore = create<VideoState>()(
       shareVideo: async (youtubeUrl: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await videosApi.create(youtubeUrl);
-          const newVideo = response.data.data;
+          const data = await videosApi.create(youtubeUrl);
+          const newVideo = data;
           set((state) => ({
             videos: [newVideo, ...state.videos],
             isLoading: false,
@@ -115,8 +115,8 @@ export const useVideoStore = create<VideoState>()(
         }
 
         try {
-          const response = await videosApi.vote(videoId, voteType);
-          const { upvote_count, downvote_count } = response.data.data.video;
+          const data = await videosApi.vote(videoId, voteType);
+          const { upvote_count, downvote_count } = data.video;
           get().updateVoteCount(videoId, upvote_count, downvote_count);
         } catch (err: any) {
           set({ videos });

@@ -13,6 +13,7 @@ import {
 import { VideosService } from './videos.service';
 import { VoteCountService } from './vote-count.service';
 import { YoutubeService } from '../youtube/youtube.service';
+import { EventsGateway } from '../websocket/events.gateway';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -33,6 +34,7 @@ export class VideosController {
     private readonly videosService: VideosService,
     private readonly voteCountService: VoteCountService,
     private readonly youtubeService: YoutubeService,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
   @Public()
@@ -93,7 +95,18 @@ export class VideosController {
       sharedById: userId,
     });
 
-    return this.videosService.toResponseDto(video, null);
+    const response = this.videosService.toResponseDto(video, null);
+
+    // Notify other clients
+    this.eventsGateway.emitNewVideo({
+      id: video.id,
+      title: video.title,
+      thumbnailUrl: video.thumbnailUrl,
+      sharedBy: { username: video.sharedBy?.username || 'Unknown' },
+      createdAt: video.createdAt,
+    });
+
+    return response;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -121,6 +134,13 @@ export class VideosController {
     );
 
     const counts = await this.voteCountService.getVoteCounts(videoId);
+
+    // Notify other clients about the vote update
+    this.eventsGateway.emitVideoUpdate({
+      id: videoId,
+      upvoteCount: counts.upvoteCount,
+      downvoteCount: counts.downvoteCount,
+    });
 
     return {
       video: {

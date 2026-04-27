@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, Suspense } from 'react';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
@@ -26,7 +26,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  const { isAuthenticated, checkAuth } = useAuthStore();
+  const { user, isAuthenticated, checkAuth } = useAuthStore();
   const { prependVideo, updateVoteCount } = useVideoStore();
   const { addNotification } = useNotificationStore();
 
@@ -58,11 +58,18 @@ function App() {
             created_at: notification.createdAt!,
           });
 
-          addNotification({
-            id: notification.id,
-            type: 'new_video',
-            message: `${notification.sharedByUsername} shared: ${notification.videoTitle}`,
-          });
+          if (notification.sharedByUsername !== user?.username) {
+            addNotification({
+              id: notification.id,
+              type: 'new_video',
+              message: `${notification.sharedByUsername} shared: ${notification.videoTitle}`,
+            });
+
+            toast.success(`${notification.sharedByUsername} shared: ${notification.videoTitle}`, {
+              icon: '🎬',
+              duration: 5000,
+            });
+          }
         } else if (notification.type === 'vote_update') {
           updateVoteCount(
             notification.videoId!,
@@ -77,7 +84,7 @@ function App() {
         disconnectSocket();
       };
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.username]);
 
   return (
     <BrowserRouter>

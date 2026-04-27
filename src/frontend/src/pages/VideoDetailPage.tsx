@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useVideoStore } from '../stores/videoStore';
 import { useAuthStore } from '../stores/authStore';
 import toast from 'react-hot-toast';
+import { ROUTES } from '../constants/routes';
 
 export function VideoDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +48,7 @@ export function VideoDetailPage() {
     return (
       <div className="text-center py-20">
         <p className="text-danger text-lg font-bold">Video not found</p>
-        <Link to="/" className="text-secondary hover:underline mt-4 inline-block font-bold">
+        <Link to={ROUTES.HOME} className="text-secondary hover:underline mt-4 inline-block font-bold">
           Back to home
         </Link>
       </div>

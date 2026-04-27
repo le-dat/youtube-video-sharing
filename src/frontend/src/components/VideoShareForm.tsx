@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useVideoStore } from '../stores/videoStore';
 
+import { ROUTES } from '../constants/routes';
+
 export function VideoShareForm() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isValid, setIsValid] = useState<boolean | null>(null);
@@ -29,7 +31,7 @@ export function VideoShareForm() {
     try {
       await shareVideo(youtubeUrl);
       toast.success('Video shared successfully!');
-      navigate(`/`);
+      navigate(ROUTES.HOME);
     } catch {
       toast.error(error || 'Failed to share video');
     }

@@ -12,11 +12,13 @@ import { connectSocket, onVideoNotification, disconnectSocket } from './lib/sock
 import { useVideoStore } from './stores/videoStore';
 import { useNotificationStore } from './stores/notificationStore';
 
+import { ROUTES } from './constants/routes';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
   return <>{children}</>;
@@ -83,12 +85,12 @@ function App() {
         <Navbar />
         <main className="container mx-auto px-4 py-6">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/video/:id" element={<VideoDetailPage />} />
+            <Route path={ROUTES.HOME} element={<HomePage />} />
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+            <Route path={ROUTES.VIDEO_DETAIL_PATH} element={<VideoDetailPage />} />
             <Route
-              path="/share"
+              path={ROUTES.SHARE}
               element={
                 <ProtectedRoute>
                   <SharePage />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../stores/authStore';
+import { ROUTES } from '../constants/routes';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ export function LoginPage() {
     try {
       await login(email, password);
       toast.success('Logged in successfully!');
-      navigate('/');
+      navigate(ROUTES.HOME);
     } catch {
       // Error handled by store
     }
@@ -77,7 +78,7 @@ export function LoginPage() {
 
         <p className="mt-4 text-center text-text-secondary">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-secondary font-bold hover:underline">
+          <Link to={ROUTES.REGISTER} className="text-secondary font-bold hover:underline">
             Register
           </Link>
         </p>

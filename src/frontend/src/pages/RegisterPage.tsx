@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../stores/authStore';
+import { ROUTES } from '../constants/routes';
 
 export function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -32,7 +33,7 @@ export function RegisterPage() {
     try {
       await register(username, email, password);
       toast.success('Registration successful!');
-      navigate('/');
+      navigate(ROUTES.HOME);
     } catch {
       // Error handled by store
     }
@@ -119,7 +120,7 @@ export function RegisterPage() {
 
         <p className="mt-4 text-center text-text-secondary">
           Already have an account?{' '}
-          <Link to="/login" className="text-secondary font-bold hover:underline">
+          <Link to={ROUTES.LOGIN} className="text-secondary font-bold hover:underline">
             Login
           </Link>
         </p>

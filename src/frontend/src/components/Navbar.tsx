@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { ROUTES } from '../constants/routes';
 import { NotificationBell } from './NotificationBell';
 
 export function Navbar() {
@@ -8,13 +9,13 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   return (
     <nav className="bg-surface border-b-3 border-text-primary px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-secondary">
+        <Link to={ROUTES.HOME} className="text-2xl font-bold text-secondary">
           YouTube Share
         </Link>
 
@@ -22,7 +23,7 @@ export function Navbar() {
           {isAuthenticated ? (
             <>
               <Link
-                to="/share"
+                to={ROUTES.SHARE}
                 className="bg-primary text-text-primary font-bold px-4 py-2 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               >
                 Share Video
@@ -41,11 +42,11 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" className="text-text-secondary hover:text-text-primary">
+              <Link to={ROUTES.LOGIN} className="text-text-secondary hover:text-text-primary">
                 Login
               </Link>
               <Link
-                to="/register"
+                to={ROUTES.REGISTER}
                 className="bg-secondary text-surface font-bold px-4 py-2 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               >
                 Register

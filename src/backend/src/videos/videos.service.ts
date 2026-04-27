@@ -84,7 +84,8 @@ export class VideosService {
       upvoteCount: 0,
       downvoteCount: 0,
     });
-    return this.videoRepository.save(video);
+    const savedVideo = await this.videoRepository.save(video);
+    return this.findById(savedVideo.id) as Promise<Video>;
   }
 
   toResponseDto(
@@ -102,8 +103,8 @@ export class VideosService {
       upvote_count: video.upvoteCount,
       downvote_count: video.downvoteCount,
       shared_by: {
-        id: video.sharedBy.id,
-        username: video.sharedBy.username,
+        id: video.sharedBy?.id ?? video.sharedById,
+        username: video.sharedBy?.username ?? 'Unknown',
       },
       user_vote: userVote ?? null,
       created_at: video.createdAt.toISOString(),

@@ -41,7 +41,7 @@ export const useVideoStore = create<VideoState>()(
           });
         } catch (err: any) {
           set({
-            error: err.response?.data?.error || 'Failed to fetch videos',
+            error: err.response?.data?.message || 'Failed to fetch videos',
             isLoading: false,
           });
         }
@@ -54,7 +54,7 @@ export const useVideoStore = create<VideoState>()(
           set({ currentVideo: data, isLoading: false });
         } catch (err: any) {
           set({
-            error: err.response?.data?.error || 'Failed to fetch video',
+            error: err.response?.data?.message || 'Failed to fetch video',
             isLoading: false,
           });
         }
@@ -72,7 +72,7 @@ export const useVideoStore = create<VideoState>()(
           return newVideo;
         } catch (err: any) {
           set({
-            error: err.response?.data?.error || 'Failed to share video',
+            error: err.response?.data?.message || 'Failed to share video',
             isLoading: false,
           });
           throw err;

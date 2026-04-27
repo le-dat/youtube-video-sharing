@@ -37,7 +37,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Email not registered');
     }
 
     const isPasswordValid = await this.usersService.validatePassword(
@@ -45,7 +45,7 @@ export class AuthService {
       dto.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Incorrect password');
     }
 
     const tokens = await this.generateTokens(user.id);
@@ -89,7 +89,7 @@ export class AuthService {
       { sub: payload.sub },
       {
         secret: accessSecret,
-        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
+        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '1m',
       },
     );
 

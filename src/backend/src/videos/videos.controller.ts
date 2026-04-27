@@ -104,11 +104,11 @@ export class VideosController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async vote(
     @Param('id', ParseUUIDPipe) videoId: string,
-    @Body('vote_type') voteType: string,
+    @Body('voteType') voteType: string,
     @CurrentUser('id') userId: string,
   ) {
     if (voteType !== VoteType.UP && voteType !== VoteType.DOWN) {
-      throw new BadRequestException('vote_type must be "up" or "down"');
+      throw new BadRequestException('voteType must be "up" or "down"');
     }
 
     const video = await this.videosService.findById(videoId);

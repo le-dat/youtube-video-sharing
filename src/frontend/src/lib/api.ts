@@ -18,7 +18,30 @@ api.interceptors.response.use(
     }
     return response.data;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If error is 401 and not already retrying
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Attempt to refresh the token
+        await axios.post(
+          `${API_BASE}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+
+        // Retry the original request
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, we could trigger a logout or just reject
+        // For now, let the error propagate so the store can handle it
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   },
 );
@@ -76,8 +99,8 @@ export const videosApi = {
   show: (id: string): Promise<Video> => api.get(`/videos/${id}`),
 
   create: (youtubeUrl: string): Promise<Video> => 
-    api.post("/videos", { youtube_url: youtubeUrl }),
+    api.post("/videos", { youtubeUrl }),
 
   vote: (videoId: string, voteType: "up" | "down"): Promise<{ video: { upvote_count: number, downvote_count: number } }> =>
-    api.post(`/videos/${videoId}/vote`, { vote_type: voteType }),
+    api.post(`/videos/${videoId}/vote`, { voteType }),
 };

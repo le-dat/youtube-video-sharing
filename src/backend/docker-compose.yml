@@ -23,6 +23,7 @@ services:
         exec docker-entrypoint.sh postgres
       "
     volumes:
+      # - postgres-data:/var/lib/postgresql/data
       - ./scripts/init-postgres.sh:/scripts/init-postgres.sh:ro
 
   youtube-sharing-redis:
@@ -39,6 +40,8 @@ services:
       - test-network
     tmpfs:
       - /data
+    # volumes:
+    #   - redis-data:/data
 
   youtube-sharing-backend:
     build:
@@ -80,3 +83,7 @@ services:
 networks:
   test-network:
     driver: bridge
+
+# volumes:
+#   postgres-data:
+#   redis-data:

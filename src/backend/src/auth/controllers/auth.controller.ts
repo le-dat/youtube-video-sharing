@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Delete,
   Body,
   Res,
   Req,
@@ -23,8 +24,8 @@ import { AuthService } from '../services/auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import type { CreateUserDto } from '../../users/dto/user.dto';
-import type { LoginDto } from '../dto/auth.dto';
+import { CreateUserDto } from '../../users/dto/user.dto';
+import { LoginDto } from '../dto/auth.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -85,7 +86,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('logout')
+  @Delete('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and revoke refresh token' })
   @ApiCookieAuth('accessToken')

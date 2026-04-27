@@ -5,6 +5,8 @@ import { UnauthorizedException, ConflictException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../../users/users.service';
 import { RedisTokenService } from './redis-token.service';
+import { User } from '../../users/entities/user.entity';
+import { UserResponseDto } from '../../users/dto/user.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -56,8 +58,10 @@ describe('AuthService', () => {
   });
 
   describe('register', () => {
-    it('should throw ConflictException if user already exists', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: '1' } as any);
+    it('should throw ConflictException if usersService.create fails', async () => {
+      usersService.create.mockRejectedValue(
+        new ConflictException('Email already exists'),
+      );
 
       await expect(
         authService.register({
@@ -74,9 +78,10 @@ describe('AuthService', () => {
         username: 'test',
         email: 'test@example.com',
       };
-      usersService.findByEmail.mockResolvedValue(null);
-      usersService.create.mockResolvedValue(mockUser as any);
-      usersService.toResponseDto.mockReturnValue(mockUser as any);
+      usersService.create.mockResolvedValue(mockUser as unknown as User);
+      usersService.toResponseDto.mockReturnValue(
+        mockUser as unknown as UserResponseDto,
+      );
       jwtService.signAsync
         .mockResolvedValueOnce('access-token')
         .mockResolvedValueOnce('refresh-token');
@@ -108,7 +113,9 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: '1' } as any);
+      usersService.findByEmail.mockResolvedValue({
+        id: '1',
+      } as unknown as User);
       usersService.validatePassword.mockResolvedValue(false);
 
       await expect(
@@ -125,9 +132,11 @@ describe('AuthService', () => {
         username: 'test',
         email: 'test@example.com',
       };
-      usersService.findByEmail.mockResolvedValue(mockUser as any);
+      usersService.findByEmail.mockResolvedValue(mockUser as unknown as User);
       usersService.validatePassword.mockResolvedValue(true);
-      usersService.toResponseDto.mockReturnValue(mockUser as any);
+      usersService.toResponseDto.mockReturnValue(
+        mockUser as unknown as UserResponseDto,
+      );
       jwtService.signAsync
         .mockResolvedValueOnce('access-token')
         .mockResolvedValueOnce('refresh-token');

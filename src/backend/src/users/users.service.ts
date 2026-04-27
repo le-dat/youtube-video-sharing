@@ -13,12 +13,14 @@ export class UsersService {
   ) {}
 
   async create(dto: CreateUserDto): Promise<User> {
-    const existing = await this.userRepository.findOne({
-      where: [{ email: dto.email.toLowerCase() }, { username: dto.username }],
-    });
+    const existingEmail = await this.findByEmail(dto.email);
+    if (existingEmail) {
+      throw new ConflictException('Email already exists');
+    }
 
-    if (existing) {
-      throw new ConflictException('User already exists');
+    const existingUsername = await this.findByUsername(dto.username);
+    if (existingUsername) {
+      throw new ConflictException('Username already exists');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -34,6 +36,12 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email: email.toLowerCase() },
+    });
+  }
+
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { username },
     });
   }
 

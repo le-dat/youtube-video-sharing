@@ -27,8 +27,8 @@ export function VideoDetailPage() {
     setIsVoting(true);
     try {
       await vote(id, voteType);
-    } catch {
-      toast.error('Failed to vote');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to vote');
     } finally {
       setIsVoting(false);
     }

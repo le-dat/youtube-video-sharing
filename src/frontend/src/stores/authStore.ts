@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
           });
         } catch (err: any) {
           set({
-            error: err.response?.data?.errors?.join(', ') || 'Registration failed',
+            error: err.response?.data?.message || 'Registration failed',
             isLoading: false,
           });
           throw err;

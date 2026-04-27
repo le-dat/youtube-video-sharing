@@ -70,4 +70,30 @@ export class VoteCountService {
       await manager.update(Video, videoId, { upvoteCount, downvoteCount });
     });
   }
+
+  /**
+   * Get the current user's vote for a video.
+   */
+  async getUserVote(
+    videoId: string,
+    userId: string,
+  ): Promise<VoteType | null> {
+    const vote = await this.voteRepository.findOne({
+      where: { videoId, userId },
+    });
+    return vote?.type ?? null;
+  }
+
+  /**
+   * Get the current vote counts for a video.
+   */
+  async getVoteCounts(
+    videoId: string,
+  ): Promise<{ upvoteCount: number; downvoteCount: number }> {
+    const video = await this.videoRepository.findOne({ where: { id: videoId } });
+    return {
+      upvoteCount: video?.upvoteCount ?? 0,
+      downvoteCount: video?.downvoteCount ?? 0,
+    };
+  }
 }

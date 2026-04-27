@@ -47,7 +47,7 @@ export const authApi = {
 
   login: (email: string, password: string) => api.post("/auth/login", { email, password }),
 
-  logout: () => api.delete("/auth/logout"),
+  logout: () => api.post("/auth/logout"),
 
   me: () => api.get("/auth/me"),
 };

@@ -38,6 +38,7 @@ export function VideoGrid() {
         <VideoCard
           key={video.id}
           video={video}
+          isLoading={isLoading}
           onVote={isAuthenticated ? (type) => handleVote(video.id, type) : undefined}
         />
       ))}

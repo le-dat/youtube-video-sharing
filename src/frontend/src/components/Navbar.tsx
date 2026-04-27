@@ -1,7 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../stores/authStore';
-import { ROUTES } from '../constants/routes';
-import { NotificationBell } from './NotificationBell';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../stores/authStore";
+import { ROUTES } from "../constants/routes";
+import { NotificationBell } from "./NotificationBell";
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -32,7 +32,7 @@ export function Navbar() {
               <NotificationBell />
 
               <span className="text-text-secondary">Hello, {user?.username}</span>
-
+              <span className="text-text-secondary">|</span>
               <button
                 onClick={handleLogout}
                 className="text-text-secondary hover:text-text-primary"

@@ -95,17 +95,16 @@ export function VideoDetailPage() {
               </span>
             </div>
 
-            {isAuthenticated && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleVote("up")}
-                  disabled={isVoting}
+                  disabled={!isAuthenticated || isVoting || isLoading || currentVideo.user_vote === "up"}
                   className={`p-3 border-3 border-text-primary font-bold transition-all ${
                     currentVideo.user_vote === "up"
-                      ? "bg-success text-surface"
+                      ? "bg-success text-surface opacity-70 cursor-not-allowed"
                       : "bg-surface text-text-primary hover:bg-success hover:text-surface"
-                  }`}
-                  title="Like"
+                  } ${(!isAuthenticated || isLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
+                  title={!isAuthenticated ? "Login to like" : (currentVideo.user_vote === "up" ? "You liked this" : "Like")}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -121,13 +120,13 @@ export function VideoDetailPage() {
                 </span>
                 <button
                   onClick={() => handleVote("down")}
-                  disabled={isVoting}
+                  disabled={!isAuthenticated || isVoting || isLoading || currentVideo.user_vote === "down"}
                   className={`p-3 border-3 border-text-primary font-bold transition-all ${
                     currentVideo.user_vote === "down"
-                      ? "bg-danger text-surface"
+                      ? "bg-danger text-surface opacity-70 cursor-not-allowed"
                       : "bg-surface text-text-primary hover:bg-danger hover:text-surface"
-                  }`}
-                  title="Dislike"
+                  } ${(!isAuthenticated || isLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
+                  title={!isAuthenticated ? "Login to dislike" : (currentVideo.user_vote === "down" ? "You disliked this" : "Dislike")}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -139,7 +138,6 @@ export function VideoDetailPage() {
                   </svg>
                 </button>
               </div>
-            )}
           </div>
 
           {currentVideo.description && (

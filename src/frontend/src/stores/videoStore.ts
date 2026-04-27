@@ -86,18 +86,19 @@ export const useVideoStore = create<VideoState>()(
       },
 
       vote: async (videoId: string, voteType: 'up' | 'down') => {
-        const videos = get().videos;
+        const { videos, currentVideo } = get();
         const videoIndex = videos.findIndex((v) => v.id === videoId);
 
-        if (videoIndex !== -1) {
-          const video = videos[videoIndex];
-          let newUpvoteCount = video.upvote_count;
-          let newDownvoteCount = video.downvote_count;
+        // Optimistic update
+        if (videoIndex !== -1 || (currentVideo && currentVideo.id === videoId)) {
+          const targetVideo = videoIndex !== -1 ? videos[videoIndex] : currentVideo!;
+          let newUpvoteCount = targetVideo.upvote_count;
+          let newDownvoteCount = targetVideo.downvote_count;
 
-          if (video.user_vote === voteType) {
+          if (targetVideo.user_vote === voteType) {
             if (voteType === 'up') newUpvoteCount--;
             else newDownvoteCount--;
-          } else if (video.user_vote === null) {
+          } else if (targetVideo.user_vote === null) {
             if (voteType === 'up') newUpvoteCount++;
             else newDownvoteCount++;
           } else {
@@ -110,14 +111,19 @@ export const useVideoStore = create<VideoState>()(
             }
           }
 
-          const updatedVideos = [...videos];
-          updatedVideos[videoIndex] = {
-            ...video,
-            upvote_count: newUpvoteCount,
-            downvote_count: newDownvoteCount,
-            user_vote: video.user_vote === voteType ? null : voteType,
-          };
-          set({ videos: updatedVideos });
+          const newUserVote = targetVideo.user_vote === voteType ? null : voteType;
+
+          set((state) => ({
+            videos: state.videos.map((v) =>
+              v.id === videoId
+                ? { ...v, upvote_count: newUpvoteCount, downvote_count: newDownvoteCount, user_vote: newUserVote }
+                : v
+            ),
+            currentVideo:
+              state.currentVideo?.id === videoId
+                ? { ...state.currentVideo, upvote_count: newUpvoteCount, downvote_count: newDownvoteCount, user_vote: newUserVote }
+                : state.currentVideo,
+          }));
         }
 
         try {
@@ -125,7 +131,8 @@ export const useVideoStore = create<VideoState>()(
           const { upvote_count, downvote_count } = data.video;
           get().updateVoteCount(videoId, upvote_count, downvote_count);
         } catch (err: any) {
-          set({ videos });
+          // Revert on error
+          set({ videos, currentVideo });
           throw err;
         }
       },
@@ -147,6 +154,10 @@ export const useVideoStore = create<VideoState>()(
               ? { ...v, upvote_count: upvoteCount, downvote_count: downvoteCount }
               : v
           ),
+          currentVideo:
+            state.currentVideo?.id === videoId
+              ? { ...state.currentVideo, upvote_count: upvoteCount, downvote_count: downvoteCount }
+              : state.currentVideo,
         }));
       },
     }),

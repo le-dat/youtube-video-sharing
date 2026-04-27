@@ -4,10 +4,11 @@ import { ROUTES } from '../constants/routes';
 
 interface VideoCardProps {
   video: Video;
+  isLoading?: boolean;
   onVote?: (voteType: 'up' | 'down') => void;
 }
 
-export function VideoCard({ video, onVote }: VideoCardProps) {
+export function VideoCard({ video, isLoading, onVote }: VideoCardProps) {
   const thumbnailUrl = video.thumbnail_url?.replace('hqdefault', 'mqdefault');
 
   return (
@@ -45,39 +46,39 @@ export function VideoCard({ video, onVote }: VideoCardProps) {
             </span>
           </div>
 
-          {onVote && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onVote('up')}
-                className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
-                  video.user_vote === 'up'
-                    ? 'bg-success text-surface'
-                    : 'bg-surface text-text-primary hover:bg-success hover:text-surface'
-                }`}
-                title="Like"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.708C19.712 10 20.5 10.788 20.5 11.765c0 .247-.052.49-.153.712l-2.94 6.47c-.38.835-1.22 1.353-2.137 1.353H9V10l5-5c.44-.44 1.16-.44 1.6 0 .44.44.44 1.16 0 1.6L14 10zM9 10H5v10h4V10z" />
-                </svg>
-                <span className="text-sm font-mono">{video.upvote_count}</span>
-              </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onVote?.('up')}
+              disabled={!onVote || isLoading || video.user_vote === 'up'}
+              className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
+                video.user_vote === 'up'
+                  ? 'bg-success text-surface opacity-70 cursor-not-allowed'
+                  : 'bg-surface text-text-primary hover:bg-success hover:text-surface'
+              } ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={!onVote ? "Login to like" : (video.user_vote === 'up' ? "You liked this" : "Like")}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.708C19.712 10 20.5 10.788 20.5 11.765c0 .247-.052.49-.153.712l-2.94 6.47c-.38.835-1.22 1.353-2.137 1.353H9V10l5-5c.44-.44 1.16-.44 1.6 0 .44.44.44 1.16 0 1.6L14 10zM9 10H5v10h4V10z" />
+              </svg>
+              <span className="text-sm font-mono">{video.upvote_count}</span>
+            </button>
 
-              <button
-                onClick={() => onVote('down')}
-                className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
-                  video.user_vote === 'down'
-                    ? 'bg-danger text-surface'
-                    : 'bg-surface text-text-primary hover:bg-danger hover:text-surface'
-                }`}
-                title="Dislike"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.292C4.288 14 3.5 13.212 3.5 12.235c0-.247.052-.49.153-.712l2.94-6.47C6.973 4.218 7.813 3.7 8.73 3.7H15v10l-5 5c-.44.44-1.16.44-1.6 0-.44-.44-.44-1.16 0-1.6l1.6-3.4zM15 14h4V4h-4v10z" />
-                </svg>
-                <span className="text-sm font-mono">{video.downvote_count}</span>
-              </button>
-            </div>
-          )}
+            <button
+              onClick={() => onVote?.('down')}
+              disabled={!onVote || isLoading || video.user_vote === 'down'}
+              className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
+                video.user_vote === 'down'
+                  ? 'bg-danger text-surface opacity-70 cursor-not-allowed'
+                  : 'bg-surface text-text-primary hover:bg-danger hover:text-surface'
+              } ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={!onVote ? "Login to dislike" : (video.user_vote === 'down' ? "You disliked this" : "Dislike")}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.292C4.288 14 3.5 13.212 3.5 12.235c0-.247.052-.49.153-.712l2.94-6.47C6.973 4.218 7.813 3.7 8.73 3.7H15v10l-5 5c-.44.44-1.16.44-1.6 0-.44-.44-.44-1.16 0-1.6l1.6-3.4zM15 14h4V4h-4v10z" />
+              </svg>
+              <span className="text-sm font-mono">{video.downvote_count}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

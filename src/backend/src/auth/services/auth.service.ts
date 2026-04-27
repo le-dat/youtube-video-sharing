@@ -89,7 +89,7 @@ export class AuthService {
       { sub: payload.sub },
       {
         secret: accessSecret,
-        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '1m',
+        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
       },
     );
 

@@ -30,7 +30,11 @@ export class VoteCountService {
   /**
    * Atomically record a vote and sync counts in a transaction.
    */
-  async recordVote(userId: string, videoId: string, type: VoteType): Promise<Vote> {
+  async recordVote(
+    userId: string,
+    videoId: string,
+    type: VoteType,
+  ): Promise<Vote> {
     return this.dataSource.transaction(async (manager) => {
       // Remove any existing vote
       await manager.delete(Vote, { userId, videoId });

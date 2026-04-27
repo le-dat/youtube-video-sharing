@@ -10,7 +10,7 @@ import {
   Get,
   UnauthorizedException,
 } from '@nestjs/common';
-import type { Response, Request } from 'express';
+import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../services/auth.service';
 import { Public } from '../../common/decorators/public.decorator';
@@ -53,7 +53,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(
-    @Req() req: Request,
+    @Req() req: { cookies?: Record<string, string> },
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies?.refreshToken;
@@ -71,11 +71,13 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(
-    @Req() req: Request,
+    @Req() req: { cookies?: Record<string, string> },
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken = req.cookies?.refreshToken;
-    await this.authService.logout(refreshToken);
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
 
     res.clearCookie('accessToken', this.getAccessCookieOptions());
     res.clearCookie('refreshToken', this.getRefreshCookieOptions());
@@ -93,8 +95,16 @@ export class AuthController {
     res: Response,
     tokens: { accessToken: string; refreshToken: string },
   ) {
-    res.cookie('accessToken', tokens.accessToken, this.getAccessCookieOptions());
-    res.cookie('refreshToken', tokens.refreshToken, this.getRefreshCookieOptions());
+    res.cookie(
+      'accessToken',
+      tokens.accessToken,
+      this.getAccessCookieOptions(),
+    );
+    res.cookie(
+      'refreshToken',
+      tokens.refreshToken,
+      this.getRefreshCookieOptions(),
+    );
   }
 
   private getAccessCookieOptions() {
@@ -103,7 +113,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax' as const,
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000,
       path: '/',
     };
   }
@@ -114,7 +124,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProduction,
       sameSite: 'lax' as const,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     };
   }

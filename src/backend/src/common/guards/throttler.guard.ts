@@ -1,22 +1,28 @@
-import { Injectable, ExecutionContext } from '@nestjs/common';
-import { ThrottlerGuard as NestThrottlerGuard } from '@nestjs/throttler';
+import { Injectable, ExecutionContext, Inject } from '@nestjs/common';
+import {
+  ThrottlerGuard as NestThrottlerGuard,
+  InjectThrottlerStorage,
+  getOptionsToken,
+} from '@nestjs/throttler';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import type {
+  ThrottlerModuleOptions,
+  ThrottlerStorage,
+} from '@nestjs/throttler';
 
 @Injectable()
 export class ThrottlerGuardImpl extends NestThrottlerGuard {
   constructor(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private readonly _opts: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private readonly _storage: any,
-    private readonly _reflector: Reflector,
+    @Inject(getOptionsToken()) opts: ThrottlerModuleOptions,
+    @InjectThrottlerStorage() storage: ThrottlerStorage,
+    reflector: Reflector,
   ) {
-    super(_opts, _storage, _reflector);
+    super(opts, storage, reflector);
   }
 
   protected async shouldSkip(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this._reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);

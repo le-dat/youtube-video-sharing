@@ -15,6 +15,10 @@ export interface TokenPair {
   refreshToken: string;
 }
 
+interface RefreshTokenPayload {
+  sub: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -62,19 +66,19 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string) {
-    const accessSecret = this.configService.get('JWT_ACCESS_SECRET');
+    const accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
     if (!accessSecret) {
       throw new Error('JWT_ACCESS_SECRET is not configured');
     }
 
-    const refreshSecret = this.configService.get('JWT_REFRESH_SECRET');
+    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
     if (!refreshSecret) {
       throw new Error('JWT_REFRESH_SECRET is not configured');
     }
 
-    let payload: { sub: string };
+    let payload: RefreshTokenPayload;
     try {
-      payload = this.jwtService.verify(refreshToken, {
+      payload = this.jwtService.verify<RefreshTokenPayload>(refreshToken, {
         secret: refreshSecret,
       });
     } catch (err) {
@@ -84,9 +88,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const isValid = await this.redisTokenService.isRefreshTokenValid(
-      refreshToken,
-    );
+    const isValid =
+      await this.redisTokenService.isRefreshTokenValid(refreshToken);
     if (!isValid) {
       throw new UnauthorizedException('Refresh token has been revoked');
     }
@@ -115,21 +118,28 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string): Promise<TokenPair> {
-    const accessToken = this.jwtService.sign(
-      { sub: userId },
-      {
-        secret: this.configService.get('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
-      },
-    );
+    const accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
+    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+    if (!accessSecret || !refreshSecret) {
+      throw new Error('JWT secrets are not configured');
+    }
 
-    const refreshToken = this.jwtService.sign(
-      { sub: userId },
-      {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION') ?? '7d',
-      },
-    );
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        { sub: userId },
+        {
+          secret: accessSecret,
+          expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        { sub: userId },
+        {
+          secret: refreshSecret,
+          expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION') ?? '7d',
+        },
+      ),
+    ]);
 
     const refreshExpiresIn = 7 * 24 * 60 * 60;
     await this.redisTokenService.storeRefreshToken(

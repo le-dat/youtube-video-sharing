@@ -12,6 +12,27 @@ export interface YouTubeVideoDetails {
   likeCount: number;
 }
 
+interface YouTubeApiResponse {
+  items: Array<{
+    snippet: {
+      title: string;
+      description: string;
+      thumbnails: {
+        high?: { url: string };
+        medium?: { url: string };
+        default?: { url: string };
+      };
+    };
+    statistics: {
+      viewCount?: string;
+      likeCount?: string;
+    };
+    contentDetails: {
+      duration: string;
+    };
+  }>;
+}
+
 @Injectable()
 export class YoutubeService {
   private readonly baseUrl = 'https://www.googleapis.com/youtube/v3';
@@ -32,27 +53,31 @@ export class YoutubeService {
   }
 
   async getVideoDetails(videoId: string): Promise<YouTubeVideoDetails> {
-    const apiKey = this.configService.get('YOUTUBE_API_KEY');
+    const apiKey = this.configService.get<string>('YOUTUBE_API_KEY');
 
     if (!apiKey) {
       throw new Error('YOUTUBE_API_KEY is not configured');
     }
 
     try {
-      const response = await axios.get(`${this.baseUrl}/videos`, {
-        params: {
-          part: 'snippet,statistics,contentDetails',
-          id: videoId,
-          key: apiKey,
+      const response = await axios.get<YouTubeApiResponse>(
+        `${this.baseUrl}/videos`,
+        {
+          params: {
+            part: 'snippet,statistics,contentDetails',
+            id: videoId,
+            key: apiKey,
+          },
+          timeout: 5000,
         },
-        timeout: 5000,
-      });
+      );
 
-      if (!response.data.items?.length) {
+      const items: YouTubeApiResponse['items'] = response.data.items;
+      if (!items?.length) {
         throw new NotFoundException('YouTube video not found');
       }
 
-      const { snippet, statistics, contentDetails } = response.data.items[0];
+      const { snippet, statistics, contentDetails } = items[0];
       return {
         youtubeId: videoId,
         title: snippet.title,
@@ -60,7 +85,8 @@ export class YoutubeService {
         thumbnailUrl:
           snippet.thumbnails.high?.url ||
           snippet.thumbnails.medium?.url ||
-          snippet.thumbnails.default?.url,
+          snippet.thumbnails.default?.url ||
+          '',
         duration: contentDetails.duration,
         viewCount: parseInt(statistics.viewCount || '0', 10),
         likeCount: parseInt(statistics.likeCount || '0', 10),

@@ -14,10 +14,7 @@ export class UsersService {
 
   async create(dto: CreateUserDto): Promise<User> {
     const existing = await this.userRepository.findOne({
-      where: [
-        { email: dto.email.toLowerCase() },
-        { username: dto.username },
-      ],
+      where: [{ email: dto.email.toLowerCase() }, { username: dto.username }],
     });
 
     if (existing) {

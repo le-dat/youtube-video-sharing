@@ -1,4 +1,12 @@
-import { IsString, IsEnum, MaxLength, IsOptional, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  MaxLength,
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { VoteType } from '../entities/vote.entity';
 

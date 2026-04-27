@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { YoutubeModule } from './youtube/youtube.module';
 import { AuthModule } from './auth/auth.module';
 import { VideosModule } from './videos/videos.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { VideosModule } from './videos/videos.module';
     YoutubeModule,
     AuthModule,
     VideosModule,
+    WebsocketModule,
   ],
   providers: [
     {

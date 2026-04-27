@@ -14,12 +14,18 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_SECRET'),
-        signOptions: {
-          expiresIn: configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_ACCESS_SECRET');
+        if (!secret) {
+          throw new Error('JWT_ACCESS_SECRET is not configured');
+        }
+        return {
+          secret,
+          signOptions: {
+            expiresIn: configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
+          },
+        };
+      },
       inject: [ConfigService],
     }),
   ],

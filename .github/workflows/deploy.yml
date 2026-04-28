@@ -87,6 +87,9 @@ jobs:
             # Pull the latest built images from GHCR
             docker compose -f docker-compose.prod.yml pull
             
+            # Stop old containers to prevent name conflicts (especially useful when migrating from v1 to v2)
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            
             # Restart containers with the newly pulled images
             docker compose -f docker-compose.prod.yml up -d
             

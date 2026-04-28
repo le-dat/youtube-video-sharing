@@ -1,30 +1,18 @@
-# 🎬 YouTube Video Sharing Application
+# 🎬 YouTube Video Sharing
 
-> A full-stack web platform for sharing YouTube videos with real-time notifications, built with NestJS, React, PostgreSQL, Redis, and WebSockets.
-
+> Share YouTube videos with real-time notifications. 
 
 https://github.com/user-attachments/assets/f93479ea-bde2-41b2-8e2b-58258f6e6547
 
-[![CI/CD](https://github.com/le-dat/youtube-video-sharing/actions/workflows/deploy.yml/badge.svg)](https://youtube-sharing.duckdns.org)
 
----
+### Key Features
 
-## 📑 Table of Contents
+- User registration and login
+- Sharing YouTube videos
+- Viewing a list of shared videos 
+- Real-time notifications when a user share video
 
-- [Introduction](#-introduction)
-- [Prerequisites](#-prerequisites)
-- [Installation & Configuration](#-installation--configuration)
-- [Database Setup](#-database-setup)
-- [Running the Application](#-running-the-application)
-- [Docker Deployment](#-docker-deployment)
-- [Usage](#-usage)
-- [Troubleshooting](#-troubleshooting)
 
----
-
-## 📖 Introduction
-
-The **YouTube Video Sharing Application** is a full-stack platform that allows authenticated users to share YouTube videos and receive instant real-time notifications when new content is posted. The system is designed for scalability and developer experience using a modern, containerized tech stack.
 
 ### Architecture Overview
 
@@ -53,95 +41,58 @@ The **YouTube Video Sharing Application** is a full-stack platform that allows a
 | **Cache / Session** | Redis 7                                                |
 | **Infrastructure**  | Docker, Docker Compose, Nginx, GitHub Actions, GHCR    |
 
-### Key Features
 
-- 🔐 **Secure Authentication** — Registration & login with HTTP-only JWT cookies (access + refresh token rotation)
-- 📹 **YouTube Video Sharing** — Paste a YouTube URL; title and description are auto-fetched via YouTube Data API v3
-- 🔔 **Real-time Notifications** — WebSocket (Socket.io) broadcasts new video shares to all connected clients instantly
-- 👍 **Voting System** — Authenticated users can upvote/downvote videos; counts sync in real-time
-- 📱 **Responsive UI** — Mobile-first design built with TailwindCSS
-- 🚀 **CI/CD Pipeline** — Automated Docker build, push to GHCR, and SSH deploy on every push to `main`
-- 📚 **API Documentation** — Interactive Swagger UI available at `/api/docs`
+
+
+
 
 ---
 
-## ✅ Prerequisites
+## ⚡ Get Running in 2 Minutes 
 
-### Required (for Docker-based setup — recommended)
-
-| Software                    | Minimum Version | Notes                                                                                             |
-| --------------------------- | --------------- | ------------------------------------------------------------------------------------------------- |
-| **Docker**                  | 24.0+           | Container runtime                                                                                 |
-| **Docker Compose**          | 2.20+           | Multi-container orchestration                                                                     |
-| **Make**                    | any             | To run `Makefile` shortcuts                                                                       |
-| **Git**                     | 2.40+           | To clone the repository                                                                           |
-| **YouTube Data API v3 Key** | —               | Required for video metadata. Get one at [Google Cloud Console](https://console.cloud.google.com/) |
-
-### Optional (for native / non-Docker development)
-
-| Software       | Minimum Version | Notes                                 |
-| -------------- | --------------- | ------------------------------------- |
-| **Node.js**    | 22 LTS          | JavaScript runtime                    |
-| **pnpm**       | 8+              | Package manager (or use `npm`/`yarn`) |
-| **PostgreSQL** | 15+             | Relational database                   |
-| **Redis**      | 7+              | In-memory cache/session store         |
-
----
-
-## ⚙️ Installation & Configuration
-
-### 1. Clone the repository
+**Prerequisites:** Docker 24.0+ · Docker Compose 2.20+ · Make (run `Makefile` shortcuts ) · Git 2.40+ · [YouTube Data API v3 Key](https://console.cloud.google.com/)
 
 ```bash
+# 1. Clone & configure
 git clone https://github.com/le-dat/youtube-video-sharing.git
 cd youtube-video-sharing
-```
-
-### 2. Set up environment variables
-
-```bash
 cp .env.example .env.dev
+# → Fill YOUTUBE_API_KEY in .env.dev (required)
+
+# 2. Start everything
+make dev-up
+
+# 3. Open
+http://localhost          # App
+http://localhost/api/docs # API docs
 ```
 
-Open `.env.dev` and fill in your values:
+Stop: `make dev-down` | Logs: `make dev-logs`
 
-```env
-# ── Database ──────────────────────────────────────────────
-DATABASE_NAME=youtube_share
-DATABASE_USER=postgres
-DATABASE_PASSWORD=your_secure_password_here
-
-# ── JWT Secrets (minimum 32 characters each) ──────────────
-JWT_ACCESS_SECRET=your_access_token_secret_min_32_chars_here
-JWT_REFRESH_SECRET=your_refresh_token_secret_min_32_chars_here
-JWT_ACCESS_EXPIRATION=15m
-JWT_REFRESH_EXPIRATION=7d
-
-# ── YouTube API ───────────────────────────────────────────
-YOUTUBE_API_KEY=your_youtube_api_key_here
-
-# ── CORS & URLs ───────────────────────────────────────────
-CORS_ORIGIN=http://localhost:5173
-
-# ── Frontend (Vite) ───────────────────────────────────────
-VITE_API_URL=http://localhost/api/v1
-VITE_WS_URL=ws://localhost/events
-```
-
-> **⚠️ Important:** `YOUTUBE_API_KEY` is required. Without it, video metadata fetching will fail. Obtain a key from [Google Cloud Console](https://console.cloud.google.com/), enable the **YouTube Data API v3**, and create credentials.
-
-### 3. Verify your environment
-
-```bash
-docker --version        # Docker version 24.x.x
-docker compose version  # Docker Compose version v2.x.x
-```
+**Services:** postgres :5432 · redis :6379 · backend :3000 · frontend :80 · nginx :80/:443
 
 ---
+
+## 💻 Native Development
+
+Requires: Node 22 LTS · pnpm 8+ · PostgreSQL 15+ · Redis 7+
+
+```bash
+# Terminal 1 — Backend
+cd src/backend && pnpm install && pnpm dev
+
+# Terminal 2 — Frontend
+cd src/frontend && pnpm install && pnpm dev
+```
+
+Set `DATABASE_HOST=localhost` and `REDIS_HOST=localhost` in `.env.dev`.
+
+---
+
+
 
 ## 🗄️ Database Setup
 
-The application uses **PostgreSQL** as its primary database and **Redis** for session/token storage. TypeORM handles all schema migrations automatically.
 
 ### With Docker (Recommended)
 
@@ -183,216 +134,77 @@ pnpm seed
 
 ---
 
-## 🚀 Running the Application
 
-### Option A — Docker Compose (Recommended)
+## 🔧 Troubleshooting
 
-**Start all services:**
+| Symptom | Fix |
+| ------- | --- |
+| `make dev-up` fails | Use `make dev-up` (not `docker compose up`) — Makefile passes `.env.dev` |
+| Backend exits on startup | Missing/invalid `YOUTUBE_API_KEY` — get one from [Google Cloud Console](https://console.cloud.google.com/) |
+| WebSocket not working | Check `nginx.conf` has `Upgrade` and `Connection` headers |
+| YouTube API 403/quota | Verify YouTube Data API v3 enabled + quota at [Google Cloud Console](https://console.cloud.google.com/) |
+| Port 80 in use | `sudo lsof -i :80` → stop conflicting process |
+| Migration fails | `make dev-down && make dev-up` — health check will sort timing |
+| `pnpm: command not found` | `npm install -g pnpm` |
+| Redis connection refused | `redis-server` or `docker run -d -p 6379:6379 redis:7` |
+| Frontend blank / API 404 | Confirm `VITE_API_URL=http://localhost/api/v1` in `.env.dev` |
+| CI/CD SSH fails | Check `~/.ssh/authorized_keys` on VPS; update `VPS_SSH_KEY` in GitHub Secrets |
 
-```bash
-make dev-up
-```
+---
 
-This single command will:
-
-- Build Docker images for the backend and frontend
-- Start PostgreSQL, Redis, backend API, frontend, and Nginx
-- Run database migrations automatically
-
-**Access the application:**
-
-| URL                         | Description               |
-| --------------------------- | ------------------------- |
-| `http://localhost`          | Main application          |
-| `http://localhost/api/docs` | Swagger API documentation |
-
-**Useful commands:**
-
-```bash
-make dev-logs    # Stream logs from all containers
-make dev-down    # Stop and remove all containers
-```
-
-### Option B — Native Development
-
-```bash
-# Terminal 1 — Backend
-cd src/backend
-pnpm install
-pnpm start:dev
-
-# Terminal 2 — Frontend
-cd src/frontend
-pnpm install
-pnpm dev
-```
-
-> Make sure PostgreSQL and Redis are running locally and `.env.dev` has `DATABASE_HOST=localhost` and `REDIS_HOST=localhost`.
-
-### Running the Test Suite
+## 🧪 Testing
 
 ```bash
 cd src/backend
 
-# Unit tests
-pnpm test
+pnpm test          # Unit tests
+pnpm test:cov      # + coverage report
 
-# Unit tests with coverage report
-pnpm test:cov
-
-# End-to-end tests (requires Docker services running)
+# E2E (requires Docker)
 docker compose -f docker-compose.e2e.yml up -d
 pnpm test:e2e
 docker compose -f docker-compose.e2e.yml down
 ```
 
-**Expected output:**
+---
 
-```
-PASS  src/auth/auth.service.spec.ts
-PASS  src/videos/videos.service.spec.ts
-PASS  src/users/users.service.spec.ts
+## 🚀 Production Deployment (VPS)
 
-Test Suites: 3 passed, 3 total
-Tests:       24 passed, 24 total
-```
+**1. Prepare VPS** — install Docker, clone repo, create `.env`
+
+**2. GitHub Secrets** → Settings → Secrets and variables → Actions:
+
+| Secret | Value |
+| ------ | ----- |
+| `VPS_HOST` | VPS IP address |
+| `VPS_USER` | SSH username (e.g., `ubuntu`) |
+| `VPS_SSH_KEY` | Private key contents (`~/.ssh/id_rsa`) |
+
+**3. Push to `main`** — CI/CD automatically:
+1. Run tests
+2. Build Docker images
+3. Push to `ghcr.io/le-dat/youtube-video-sharing`
+4. SSH into VPS
+5. Pull images + recreate containers
 
 ---
 
-## 🐳 Docker Deployment
-
-### Local Build & Run
-
-```bash
-# Build all images
-docker compose -f docker-compose.prod.yml build
-
-# Start all services in detached mode
-docker compose -f docker-compose.prod.yml up -d
-
-# View running containers
-docker compose -f docker-compose.prod.yml ps
-
-# Stop all services
-docker compose -f docker-compose.prod.yml down
-```
-
-### Production Deployment (VPS + GHCR CI/CD)
-
-This project uses a CI/CD pipeline where GitHub Actions builds Docker images, pushes them to GitHub Container Registry (GHCR), then deploys them to your VPS via SSH.
-
-#### Step 1 — Prepare your VPS
-
-```bash
-# Install Docker & Docker Compose
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-
-# Clone the repository
-git clone https://github.com/le-dat/youtube-video-sharing.git
-cd youtube-video-sharing
-
-# Create the production environment file
-cp .env.example .env
-# Edit .env with production values (domain, secrets, API keys)
-```
-
-Edit `.env` on the VPS for production:
-
-```env
-CORS_ORIGIN=https://yourdomain.com
-VITE_API_URL=https://yourdomain.com/api/v1
-VITE_WS_URL=wss://yourdomain.com/events
-# ... all other variables
-```
-
-#### Step 2 — Configure GitHub Secrets
-
-In your GitHub repository, go to **Settings → Secrets and variables → Actions** and add:
-
-| Secret        | Value                                              |
-| ------------- | -------------------------------------------------- |
-| `VPS_HOST`    | Your VPS IP address                                |
-| `VPS_USER`    | SSH username (e.g., `ubuntu`, `root`)              |
-| `VPS_SSH_KEY` | Contents of your private SSH key (`~/.ssh/id_rsa`) |
-
-#### Step 3 — Automated Deployment Flow
-
-On every push to `main`, GitHub Actions will:
-
-1. ✅ Run the test suite
-2. 🐳 Build Docker images for frontend and backend
-3. 📦 Push images to `ghcr.io/le-dat/youtube-video-sharing`
-4. 🔗 SSH into the VPS
-5. ⬇️ Pull the latest images
-6. 🔄 Recreate containers using `docker-compose.prod.yml`
-
-#### Docker Compose Services Overview
-
-| Service    | Description                          | Port             |
-| ---------- | ------------------------------------ | ---------------- |
-| `postgres` | PostgreSQL 15 with persistent volume | 5432 (internal)  |
-| `redis`    | Redis 7 for sessions & caching       | 6379 (internal)  |
-| `backend`  | NestJS REST API + WebSocket server   | 3000 (internal)  |
-| `frontend` | React/Vite static build              | 80 (internal)    |
-| `nginx`    | Reverse proxy & TLS termination      | 80, 443 (public) |
-
----
-
-## 📱 Usage
-
-### 1. Register or Log In
-
-Navigate to `http://localhost` and create a new account, or log in with existing credentials. Authentication uses HTTP-only cookies — no tokens are exposed to JavaScript.
-
-### 2. Share a YouTube Video
-
-Once logged in:
-
-1. Click the **"Share a movie"** button in the top navigation bar.
-2. Paste a valid YouTube URL into the input field.  
-   Example: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`
-3. Click **Share**. The backend validates the URL and fetches the video title and description via YouTube Data API v3.
-4. Your video appears in the shared videos feed immediately.
-
-### 3. Receive Real-time Notifications
-
-Open a second browser window (or incognito tab) and log in with a different account. When a video is shared in the first window, a toast notification pops up in the second window in real time — no page refresh needed.
-
-### 4. Vote on Videos
-
-Any authenticated user can upvote or downvote a shared video using the thumbs-up/down buttons on each video card. Vote counts update live across all connected clients.
-
-### 5. API Documentation
-
-The full REST API is documented with Swagger UI:
+## 📂 Project Structure
 
 ```
-http://localhost/api/docs
+youtube-video-sharing/
+├── src/
+│   ├── backend/           # NestJS application
+│   │   └── src/
+│   │       ├── auth/      # JWT authentication
+│   │       ├── users/     # User CRUD
+│   │       ├── videos/    # Video sharing + voting
+│   │       └── websocket/ # Real-time events
+│   └── frontend/          # React + Vite + TailwindCSS
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── docker-compose.e2e.yml
+└── Makefile
 ```
 
----
 
-## 🔧 Troubleshooting
-
-| Problem                                       | Likely Cause                                                | Solution                                                                                                                             |
-| --------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **`make dev-up` fails with env errors**       | `docker compose up` doesn't auto-load `.env.dev`            | Always use `make dev-up` — the Makefile passes `--env-file .env.dev` automatically                                                   |
-| **Backend exits on startup**                  | Missing or invalid `YOUTUBE_API_KEY`                        | Ensure `YOUTUBE_API_KEY` is set in `.env.dev` with a valid key from Google Cloud Console                                             |
-| **WebSocket / notifications not working**     | Nginx not forwarding upgrade headers                        | Verify `nginx.conf` includes `proxy_set_header Upgrade $http_upgrade;` and `proxy_set_header Connection "upgrade";`                  |
-| **YouTube API returns 403 or quota exceeded** | Daily quota (10,000 units/day) exhausted or API not enabled | Check quota at [Google Cloud Console](https://console.cloud.google.com/) and confirm YouTube Data API v3 is enabled for your project |
-| **Port 80 already in use**                    | Apache or another process bound to port 80                  | Run `sudo lsof -i :80`, stop the conflicting process, or change the Nginx port in `docker-compose.yml`                               |
-| **Database migration failure**                | PostgreSQL not ready before backend starts                  | Run `make dev-down && make dev-up` to restart cleanly; health checks should resolve timing                                           |
-| **`pnpm: command not found`**                 | pnpm not installed                                          | Install with `npm install -g pnpm`                                                                                                   |
-| **Redis connection refused (native dev)**     | Redis not running locally                                   | Start with `redis-server` or use Docker: `docker run -d -p 6379:6379 redis:7`                                                        |
-| **Frontend shows blank page / API 404**       | `VITE_API_URL` pointing to wrong address                    | Confirm `VITE_API_URL=http://localhost/api/v1` in `.env.dev`                                                                         |
-| **CI/CD SSH into VPS fails**                  | `VPS_SSH_KEY` incorrect or public key missing on VPS        | Verify `~/.ssh/authorized_keys` on the VPS contains your public key; update the GitHub secret if needed                              |
-
----
-
-## 📚 Additional Resources
-
-- 🌐 **Live Demo:** [https://youtube-sharing.duckdns.org](https://youtube-sharing.duckdns.org)
-- 📖 **Swagger API Docs:** `http://localhost/api/docs` (when running locally)
-- 🏗️ **Architecture Details:** See `CLAUDE.md` in the repository root
-- 🔑 **Environment Reference:** See `.env.example` for all available configuration variables

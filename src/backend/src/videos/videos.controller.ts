@@ -70,10 +70,7 @@ export class VideosController {
   @ApiBearerAuth()
   @ApiResponse({ status: 201, description: 'Video shared successfully' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async share(
-    @Body() dto: ShareVideoDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  async share(@Body() dto: ShareVideoDto, @CurrentUser('id') userId: string) {
     const videoId = this.youtubeService.extractVideoId(dto.youtubeUrl);
     if (!videoId) {
       throw new BadRequestException('Invalid YouTube URL');
@@ -120,18 +117,15 @@ export class VideosController {
     @Body('voteType') voteType: string,
     @CurrentUser('id') userId: string,
   ) {
-    if (voteType !== VoteType.UP && voteType !== VoteType.DOWN) {
+    const voteTypeEnum = voteType as VoteType;
+    if (voteTypeEnum !== VoteType.UP && voteTypeEnum !== VoteType.DOWN) {
       throw new BadRequestException('voteType must be "up" or "down"');
     }
 
     const video = await this.videosService.findById(videoId);
     if (!video) throw new NotFoundException('Video not found');
 
-    await this.voteCountService.recordVote(
-      userId,
-      videoId,
-      voteType as VoteType,
-    );
+    await this.voteCountService.recordVote(userId, videoId, voteTypeEnum);
 
     const counts = await this.voteCountService.getVoteCounts(videoId);
 

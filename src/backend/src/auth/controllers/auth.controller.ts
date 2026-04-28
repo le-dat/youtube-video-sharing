@@ -86,7 +86,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete('logout')
+  @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and revoke refresh token' })
   @ApiCookieAuth('accessToken')

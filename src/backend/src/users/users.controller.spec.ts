@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { UsersController } from './users.controller';
@@ -42,7 +43,6 @@ describe('UsersController', () => {
 
       const result = await controller.getProfile('user-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockUsersService.findById).toHaveBeenCalledWith('user-1');
       expect(result).toEqual(userDto);
     });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { VideosController } from './videos.controller';
@@ -89,7 +90,6 @@ describe('VideosController', () => {
 
       const result = await controller.list({});
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVideosService.findAll).toHaveBeenCalled();
       expect(result).toEqual(paginatedResult);
     });
@@ -108,7 +108,6 @@ describe('VideosController', () => {
 
       await controller.list({ page: 2, limit: 10 });
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVideosService.findAll).toHaveBeenCalledWith({
         page: 2,
         limit: 10,
@@ -137,9 +136,7 @@ describe('VideosController', () => {
 
       const result = await controller.show('video-1', 'user-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVideosService.findById).toHaveBeenCalledWith('video-1');
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVoteCountService.getUserVote).toHaveBeenCalledWith(
         'video-1',
         'user-1',
@@ -166,7 +163,6 @@ describe('VideosController', () => {
 
       const result = await controller.show('video-1', undefined);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVoteCountService.getUserVote).not.toHaveBeenCalled();
       expect(result.user_vote).toBeNull();
     });
@@ -213,13 +209,10 @@ describe('VideosController', () => {
 
       const result = await controller.share(dto, 'user-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockYoutubeService.extractVideoId).toHaveBeenCalledWith(
         dto.youtubeUrl,
       );
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVideosService.create).toHaveBeenCalled();
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockEventsGateway.emitNewVideo).toHaveBeenCalled();
       expect(result.title).toBe('New Video');
     });
@@ -256,13 +249,11 @@ describe('VideosController', () => {
 
       const result = await controller.vote('video-1', 'up', 'user-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVoteCountService.recordVote).toHaveBeenCalledWith(
         'user-1',
         'video-1',
         'up',
       );
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockEventsGateway.emitVideoUpdate).toHaveBeenCalledWith({
         id: 'video-1',
         upvoteCount: 11,

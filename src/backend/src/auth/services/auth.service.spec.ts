@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -210,7 +211,6 @@ describe('AuthService', () => {
 
       await authService.logout('refresh-token');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(redisTokenService.revokeRefreshToken).toHaveBeenCalledWith(
         'refresh-token',
       );
@@ -219,8 +219,38 @@ describe('AuthService', () => {
     it('should do nothing if no refresh token provided', async () => {
       await authService.logout('');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(redisTokenService.revokeRefreshToken).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getUser', () => {
+    it('should return UserResponseDto when user is found', async () => {
+      const mockUser = {
+        id: 'user-1',
+        username: 'test',
+        email: 'test@example.com',
+        createdAt: new Date(),
+      };
+      usersService.findById.mockResolvedValue(mockUser as unknown as User);
+      usersService.toResponseDto.mockReturnValue({
+        id: 'user-1',
+        username: 'test',
+        email: 'test@example.com',
+        createdAt: mockUser.createdAt,
+      });
+
+      const result = await authService.getUser('user-1');
+
+      expect(usersService.findById).toHaveBeenCalledWith('user-1');
+      expect(result.username).toBe('test');
+    });
+
+    it('should throw UnauthorizedException when user not found', async () => {
+      usersService.findById.mockResolvedValue(null);
+
+      await expect(authService.getUser('non-existent')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
@@ -59,7 +60,6 @@ describe('AuthController', () => {
 
       const result = await controller.register(dto, mockResponse as Response);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockAuthService.register).toHaveBeenCalledWith(dto);
       expect(mockResponse.cookie).toHaveBeenCalled();
       expect(result.user).toEqual(user);
@@ -81,7 +81,6 @@ describe('AuthController', () => {
 
       const result = await controller.login(dto, mockResponse as Response);
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockAuthService.login).toHaveBeenCalledWith(dto);
       expect(mockResponse.cookie).toHaveBeenCalled();
       expect(result.user).toEqual(user);
@@ -99,7 +98,6 @@ describe('AuthController', () => {
         mockResponse as Response,
       );
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockAuthService.refresh).toHaveBeenCalledWith('valid-refresh');
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'accessToken',
@@ -132,7 +130,6 @@ describe('AuthController', () => {
         mockResponse as Response,
       );
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockAuthService.logout).toHaveBeenCalledWith('refresh');
       expect(mockResponse.clearCookie).toHaveBeenCalledWith(
         'accessToken',
@@ -157,7 +154,6 @@ describe('AuthController', () => {
 
       const result = await controller.getProfile('user-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockAuthService.getUser).toHaveBeenCalledWith('user-1');
       expect(result).toEqual(userDto);
     });

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { NewVideoNotification } from './types/notification.type';
@@ -22,6 +23,8 @@ import { WS_EVENTS } from './constants';
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
+
+  private readonly logger = new Logger(EventsGateway.name);
 
   private authenticatedUsers = new Map<string, string>();
   private userSockets = new Map<string, Set<string>>();
@@ -42,12 +45,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           });
           this.authenticatedUsers.set(client.id, payload.sub);
           this.addUserSocket(payload.sub, client.id);
-          console.log(`Client connected: ${client.id} (User: ${payload.sub})`);
+          this.logger.log(
+            `Client connected: ${client.id} (User: ${payload.sub})`,
+          );
         } else {
-          console.log(`Client connected: ${client.id} (Anonymous)`);
+          this.logger.log(`Client connected: ${client.id} (Anonymous)`);
         }
       } catch {
-        console.log(`Client connected: ${client.id} (Invalid token)`);
+        this.logger.log(`Client connected: ${client.id} (Invalid token)`);
       }
     })();
   }
@@ -58,7 +63,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.removeUserSocket(userId, client.id);
       this.authenticatedUsers.delete(client.id);
     }
-    console.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   private extractToken(client: Socket): string | null {

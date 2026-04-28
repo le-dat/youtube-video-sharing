@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException } from '@nestjs/common';
@@ -49,7 +50,6 @@ describe('JwtStrategy', () => {
         username: 'testuser',
         email: 'test@example.com',
       });
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockUsersService.findById).toHaveBeenCalledWith('user-1');
     });
 

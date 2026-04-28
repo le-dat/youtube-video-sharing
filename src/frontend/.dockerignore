@@ -1,13 +1,13 @@
 node_modules
 dist
 .pnpm
+.git
 *.log
+.env
 .env.local
 .env.*.local
 coverage
 .nyc_output
-.git
 .vscode
 .idea
 README.md
-.env

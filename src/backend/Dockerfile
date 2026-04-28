@@ -1,13 +1,26 @@
-FROM node:22-alpine As development
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && corepack prepare pnpm@10.10.0 --activate
-RUN pnpm install --frozen-lockfile
+# Cài đặt pnpm trên Debian-based image
+RUN npm install -g pnpm
+
+COPY package*.json ./
+RUN pnpm install
 
 COPY . .
+RUN pnpm run build
 
-RUN pnpm build
+FROM node:22-slim
 
-CMD ["pnpm", "start:dev"]
+WORKDIR /app
+
+RUN npm install -g pnpm
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 5000
+
+CMD ["pnpm", "start:prod"]

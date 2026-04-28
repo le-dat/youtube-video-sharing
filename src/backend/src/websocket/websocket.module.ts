@@ -14,7 +14,6 @@ import { EventsGateway } from './events.gateway';
       inject: [ConfigService],
     }),
   ],
-  controllers: [],
   providers: [EventsGateway],
   exports: [EventsGateway],
 })

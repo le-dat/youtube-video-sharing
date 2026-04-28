@@ -39,7 +39,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = isProduction ? 'Internal server error' : exception.message;
     }
 
-    // Log lỗi để lập trình viên theo dõi
     const logMessage = `${request.method} ${request.url} - Status: ${status} - Message: ${
       Array.isArray(message) ? message.join(', ') : message
     }`;

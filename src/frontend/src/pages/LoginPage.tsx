@@ -28,9 +28,9 @@ export function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <div className="bg-surface border-3 border-text-primary p-8 shadow-neo">
-        <h1 className="text-2xl font-bold text-text-primary mb-6">Login</h1>
+    <div className="w-full px-4 md:px-0 md:max-w-md mx-auto mt-6 md:mt-10">
+      <div className="bg-surface border-3 border-text-primary p-4 md:p-8 shadow-neo">
+        <h1 className="text-xl md:text-2xl font-bold text-text-primary mb-6">Login</h1>
 
         {error && (
           <div className="mb-4 p-3 bg-danger/10 border-3 border-danger text-danger">

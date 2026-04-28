@@ -39,18 +39,18 @@ export function VideoCard({ video, isLoading, onVote }: VideoCardProps) {
           Shared by {video.shared_by.username}
         </p>
 
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 mt-3">
           <div className="flex items-center gap-4 text-sm">
             <span className="text-text-secondary font-mono">
               {formatCount(video.view_count)} views
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => onVote?.('up')}
               disabled={!onVote || isLoading || video.user_vote === 'up'}
-              className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
+              className={`flex-1 md:flex-none p-2 border-3 border-text-primary font-bold transition-all flex items-center justify-center gap-1 ${
                 video.user_vote === 'up'
                   ? 'bg-success text-surface opacity-70 cursor-not-allowed'
                   : `bg-surface text-text-primary ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-success hover:text-surface'}`
@@ -66,7 +66,7 @@ export function VideoCard({ video, isLoading, onVote }: VideoCardProps) {
             <button
               onClick={() => onVote?.('down')}
               disabled={!onVote || isLoading || video.user_vote === 'down'}
-              className={`p-2 border-3 border-text-primary font-bold transition-all flex items-center gap-1 ${
+              className={`flex-1 md:flex-none p-2 border-3 border-text-primary font-bold transition-all flex items-center justify-center gap-1 ${
                 video.user_vote === 'down'
                   ? 'bg-danger text-surface opacity-70 cursor-not-allowed'
                   : `bg-surface text-text-primary ${(!onVote || isLoading) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-danger hover:text-surface'}`

@@ -55,6 +55,9 @@ import { WebsocketModule } from './websocket/websocket.module';
           autoLoadEntities: true,
           // Never auto-sync in production - use migrations instead
           synchronize: isDevelopment && !isProduction,
+          // Auto run migrations in production
+          migrationsRun: isProduction,
+          migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
           logging: isDevelopment,
         };
       },

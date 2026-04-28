@@ -85,10 +85,10 @@ jobs:
             fi
             
             # Pull the latest built images from GHCR
-            docker-compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml pull
             
             # Restart containers with the newly pulled images
-            docker-compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d
             
             # Clean up old images to free up disk space
             docker image prune -af

@@ -19,30 +19,37 @@ export function Navbar() {
           YouTube Share
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           {isAuthenticated ? (
             <>
               <Link
                 to={ROUTES.SHARE}
-                className="bg-primary text-text-primary font-bold px-4 py-2 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                className="hidden md:inline-block bg-primary text-text-primary font-bold px-4 py-2 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
               >
                 Share Video
               </Link>
 
+              <Link
+                to={ROUTES.SHARE}
+                className="md:hidden bg-primary text-text-primary font-bold p-2 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+              >
+                +
+              </Link>
+
               <NotificationBell />
 
-              <span className="text-text-secondary">Hello, {user?.username}</span>
-              <span className="text-text-secondary">|</span>
+              <span className="hidden md:inline text-text-secondary">Hello, {user?.username}</span>
+              <span className="hidden md:inline text-text-secondary">|</span>
               <button
                 onClick={handleLogout}
-                className="text-text-secondary hover:text-text-primary"
+                className="text-text-secondary hover:text-text-primary text-sm md:text-base"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to={ROUTES.LOGIN} className="text-text-secondary hover:text-text-primary">
+              <Link to={ROUTES.LOGIN} className="text-text-secondary hover:text-text-primary text-sm md:text-base">
                 Login
               </Link>
               <Link

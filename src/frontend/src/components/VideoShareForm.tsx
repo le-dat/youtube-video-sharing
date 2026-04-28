@@ -52,19 +52,19 @@ export function VideoShareForm() {
             setIsValid(e.target.value ? validateUrl(e.target.value) : null);
           }}
           placeholder="https://www.youtube.com/watch?v=..."
-          className={`w-full px-4 py-3 bg-surface border-3 text-text-primary placeholder-text-secondary focus:outline-none ${
+          className={`w-full px-4 py-3 bg-surface border-3 border-text-primary text-text-primary placeholder-text-secondary focus:outline-none text-sm md:text-base ${
             isValid === false ? 'border-danger' : 'border-text-primary'
           }`}
         />
         {isValid === false && (
-          <p className="mt-1 text-sm text-danger font-mono">Please enter a valid YouTube URL</p>
+          <p className="mt-1 text-xs md:text-sm text-danger font-mono">Please enter a valid YouTube URL</p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={isLoading || !youtubeUrl}
-        className="w-full bg-primary text-text-primary font-bold py-3 px-4 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-primary text-text-primary font-bold py-3 px-4 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
       >
         {isLoading ? 'Sharing...' : 'Share Video'}
       </button>

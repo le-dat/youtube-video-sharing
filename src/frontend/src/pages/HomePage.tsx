@@ -18,18 +18,18 @@ export function HomePage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">Recent Videos</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-text-primary">Recent Videos</h1>
         <p className="text-text-secondary mt-1">Discover and share YouTube videos</p>
       </div>
 
       <VideoGrid />
 
       {page < totalPages && (
-        <div className="mt-8 text-center">
+        <div className="mt-6 md:mt-8 text-center">
           <button
             onClick={loadMore}
             disabled={isLoading}
-            className="bg-secondary text-surface font-bold px-6 py-3 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
+            className="w-full md:w-auto bg-secondary text-surface font-bold px-6 py-3 border-3 border-text-primary shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50"
           >
             {isLoading ? 'Loading...' : 'Load More'}
           </button>

@@ -3,13 +3,13 @@ import { BackButton } from '../components/BackButton';
 
 export function SharePage() {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full px-4 md:px-0 md:max-w-2xl mx-auto">
       <div className="mb-6">
         <BackButton />
       </div>
 
-      <div className="bg-surface border-3 border-text-primary p-8 shadow-neo">
-        <h1 className="text-2xl font-bold text-text-primary mb-2">Share a YouTube Video</h1>
+      <div className="bg-surface border-3 border-text-primary p-4 md:p-8 shadow-neo">
+        <h1 className="text-xl md:text-2xl font-bold text-text-primary mb-2">Share a YouTube Video</h1>
         <p className="text-text-secondary mb-6">
           Paste a YouTube URL to share it with the community
         </p>

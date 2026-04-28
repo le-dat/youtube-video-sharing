@@ -82,31 +82,31 @@ export function VideoDetailPage() {
             {currentVideo.title}
           </h1>
 
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <span className="text-text-secondary">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between flex-wrap gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+              <span className="text-text-secondary text-sm md:text-base">
                 Shared by{" "}
                 <span className="text-secondary font-bold">
                   {currentVideo.shared_by.username}
                 </span>
               </span>
-              <span className="text-text-secondary font-mono text-sm">
+              <span className="text-text-secondary font-mono text-xs md:text-sm">
                 {new Date(currentVideo.created_at).toLocaleDateString()}
               </span>
             </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full md:w-auto">
                 <button
                   onClick={() => handleVote("up")}
                   disabled={!isAuthenticated || isVoting || isLoading || currentVideo.user_vote === "up"}
-                  className={`p-3 border-3 border-text-primary font-bold transition-all ${
+                  className={`flex-1 md:flex-none p-2 md:p-3 border-3 border-text-primary font-bold transition-all ${
                     currentVideo.user_vote === "up"
                       ? "bg-success text-surface opacity-70 cursor-not-allowed"
                       : `bg-surface text-text-primary ${(!isAuthenticated || isVoting || isLoading) ? "opacity-50 cursor-not-allowed" : "hover:bg-success hover:text-surface"}`
                   }`}
                   title={!isAuthenticated ? "Login to like" : (currentVideo.user_vote === "up" ? "You liked this" : "Like")}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -115,20 +115,20 @@ export function VideoDetailPage() {
                     />
                   </svg>
                 </button>
-                <span className="text-xl font-bold text-text-primary font-mono">
+                <span className="text-lg md:text-xl font-bold text-text-primary font-mono">
                   {currentVideo.upvote_count - currentVideo.downvote_count}
                 </span>
                 <button
                   onClick={() => handleVote("down")}
                   disabled={!isAuthenticated || isVoting || isLoading || currentVideo.user_vote === "down"}
-                  className={`p-3 border-3 border-text-primary font-bold transition-all ${
+                  className={`flex-1 md:flex-none p-2 md:p-3 border-3 border-text-primary font-bold transition-all ${
                     currentVideo.user_vote === "down"
                       ? "bg-danger text-surface opacity-70 cursor-not-allowed"
                       : `bg-surface text-text-primary ${(!isAuthenticated || isVoting || isLoading) ? "opacity-50 cursor-not-allowed" : "hover:bg-danger hover:text-surface"}`
                   }`}
                   title={!isAuthenticated ? "Login to dislike" : (currentVideo.user_vote === "down" ? "You disliked this" : "Dislike")}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

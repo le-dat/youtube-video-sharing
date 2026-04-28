@@ -20,6 +20,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || '22' }}
           script: |
+            set -e
             cd /home/moltbot/server/youtube-sharing-nestjs
             git fetch origin
             git pull origin main

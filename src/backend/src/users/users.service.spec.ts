@@ -38,7 +38,6 @@ describe('UsersService', () => {
     };
 
     it('should throw ConflictException if email already exists', async () => {
-      // Giả lập tìm thấy email trùng
       repository.findOne.mockResolvedValueOnce({ id: '1' } as User);
 
       await expect(service.create(createUserDto)).rejects.toThrow(
@@ -47,9 +46,7 @@ describe('UsersService', () => {
     });
 
     it('should throw ConflictException if username already exists', async () => {
-      // Lần 1 tìm email: trả về null (không trùng)
       repository.findOne.mockResolvedValueOnce(null);
-      // Lần 2 tìm username: trả về user (trùng)
       repository.findOne.mockResolvedValueOnce({ id: '1' } as User);
 
       await expect(service.create(createUserDto)).rejects.toThrow(
@@ -58,7 +55,7 @@ describe('UsersService', () => {
     });
 
     it('should create a user successfully with username containing spaces', async () => {
-      repository.findOne.mockResolvedValue(null); // Không trùng cái nào
+      repository.findOne.mockResolvedValue(null);
       repository.create.mockReturnValue(createUserDto as unknown as User);
       repository.save.mockResolvedValue({
         id: 'uuid',
@@ -81,12 +78,11 @@ describe('UsersService', () => {
 
     it('should hash the password before saving', async () => {
       repository.findOne.mockResolvedValue(null);
-      repository.create.mockImplementation((dto) => dto as any);
-      repository.save.mockImplementation((user) => Promise.resolve(user as any));
+      repository.create.mockImplementation((dto) => dto as User);
+      repository.save.mockImplementation((user: User) => Promise.resolve(user));
 
       const result = await service.create(createUserDto);
 
-      // Kiểm tra xem password đã được hash chưa (bcrypt hash thường bắt đầu bằng $2)
       expect(result.password).not.toBe(createUserDto.password);
       expect(result.password.startsWith('$2')).toBe(true);
     });

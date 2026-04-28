@@ -1,0 +1,11 @@
+node_modules
+dist
+.pnpm
+*.log
+.env.local
+.env.*.local
+coverage
+.nyc_output
+.git
+.vscode
+.idea

@@ -1,7 +1,6 @@
 import {
   Controller,
   Post,
-  Delete,
   Body,
   Res,
   Req,

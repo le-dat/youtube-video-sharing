@@ -40,7 +40,7 @@
 
 ---
 
-## ⚡ Get Running in 2 Minutes
+## ⚡ Get Running in 2 Minutes (Recommended)
 
 **Prerequisites:** Docker 24.0+ · Docker Compose 2.20+ · Make (run `Makefile` shortcuts ) · Git 2.40+ · [YouTube Data API v3 Key](https://console.cloud.google.com/)
 
@@ -120,7 +120,7 @@ Edit `.env.dev` with your credentials:
 ```env
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
-DATABASE_USER=verno           # your Linux username
+DATABASE_USER=postgres           
 DATABASE_PASSWORD=your_password
 DATABASE_NAME=youtube_share
 REDIS_HOST=localhost

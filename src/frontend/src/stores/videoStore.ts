@@ -13,7 +13,7 @@ interface VideoState {
 
   fetchVideos: (page?: number) => Promise<void>;
   fetchVideo: (id: string) => Promise<void>;
-  shareVideo: (youtubeUrl: string) => Promise<Video>;
+  shareVideo: (youtubeUrl: string) => Promise<void>;
   vote: (videoId: string, voteType: 'up' | 'down') => Promise<void>;
   prependVideo: (video: Video) => void;
   updateVoteCount: (videoId: string, upvoteCount: number, downvoteCount: number) => void;
@@ -63,19 +63,9 @@ export const useVideoStore = create<VideoState>()(
       shareVideo: async (youtubeUrl: string) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await videosApi.create(youtubeUrl);
-          const newVideo = data;
-          
-          set((state) => {
-            const exists = state.videos.some((v) => v.id === newVideo.id);
-            if (exists) return { isLoading: false };
-            return {
-              videos: [newVideo, ...state.videos],
-              isLoading: false,
-            };
-          });
-          
-          return newVideo;
+          await videosApi.create(youtubeUrl);
+          set({ isLoading: false });
+          return;
         } catch (err: any) {
           set({
             error: err.response?.data?.message || 'Failed to share video',

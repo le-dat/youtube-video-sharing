@@ -40,6 +40,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-surface);
   color: var(--color-text);
-  antialiased: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-width: 320px;
 }

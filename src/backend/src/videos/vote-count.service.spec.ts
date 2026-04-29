@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -51,9 +52,7 @@ describe('VoteCountService', () => {
 
       await service.syncVoteCounts('video-1');
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVoteRepository.count).toHaveBeenCalled();
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockVideoRepository.update).toHaveBeenCalled();
     });
   });

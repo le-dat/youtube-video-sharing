@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -51,7 +52,6 @@ describe('EventsGateway', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockJwtService.verify).toHaveBeenCalled();
     });
 
@@ -70,7 +70,6 @@ describe('EventsGateway', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockJwtService.verify).toHaveBeenCalled();
     });
 
@@ -87,7 +86,6 @@ describe('EventsGateway', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockJwtService.verify).not.toHaveBeenCalled();
     });
   });

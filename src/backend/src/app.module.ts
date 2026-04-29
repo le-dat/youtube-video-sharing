@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { BullModule } from '@nestjs/bullmq';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuardImpl } from './common/guards/throttler.guard';
 import { HealthModule } from './health/health.module';
@@ -11,12 +12,22 @@ import { YoutubeModule } from './youtube/youtube.module';
 import { AuthModule } from './auth/auth.module';
 import { VideosModule } from './videos/videos.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { VideosQueueModule } from './videos/queue/videos-queue.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['../../.env.dev', '../../.env', '.env.dev', '.env'],
+    }),
+    BullModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('REDIS_HOST') ?? 'localhost',
+          port: configService.get<number>('REDIS_PORT') ?? 6379,
+        },
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -75,6 +86,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     YoutubeModule,
     AuthModule,
     VideosModule,
+    VideosQueueModule,
     WebsocketModule,
   ],
   providers: [

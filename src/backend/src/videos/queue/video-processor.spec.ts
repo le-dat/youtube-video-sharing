@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Job } from 'bullmq';
 import { VideosService } from '../videos.service';
 import { YoutubeService } from '../../youtube/youtube.service';
@@ -180,7 +181,9 @@ describe('VideoProcessor', () => {
 
       processor.onCompleted(mockJob);
 
-      expect(loggerSpy).toHaveBeenCalledWith('Job job-999 completed successfully');
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Job job-999 completed successfully',
+      );
     });
   });
 });

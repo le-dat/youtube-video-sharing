@@ -75,11 +75,15 @@ describe('AuthService', () => {
 
     it('should pass plain password to usersService.create (hashing happens in UsersService)', async () => {
       const plainPassword = 'plainPassword123';
-      let capturedDto: { password: string };
+      let capturedDto: { username: string; email: string; password: string };
 
-      usersService.create.mockImplementation(async (dto: { password: string }) => {
+      usersService.create.mockImplementation((dto) => {
         capturedDto = dto;
-        return { id: 'user-1', username: dto.username, email: dto.email } as unknown as User;
+        return Promise.resolve({
+          id: 'user-1',
+          username: dto.username,
+          email: dto.email,
+        } as unknown as User);
       });
       usersService.toResponseDto.mockReturnValue({
         id: 'user-1',
@@ -183,11 +187,11 @@ describe('AuthService', () => {
   });
 
   describe('refresh', () => {
-    it('should throw if JWT_ACCESS_SECRET is not configured', async () => {
+    it('should throw if JWT secrets are not configured', async () => {
       configService.get.mockReturnValue(undefined);
 
       await expect(authService.refresh('some-token')).rejects.toThrow(
-        'JWT_ACCESS_SECRET is not configured',
+        'JWT secrets are not configured',
       );
     });
 
@@ -204,17 +208,26 @@ describe('AuthService', () => {
       );
     });
 
-    it('should return new access token for valid refresh token', async () => {
+    it('should revoke old token and return new token pair for valid refresh token', async () => {
       configService.get
         .mockReturnValueOnce('access-secret')
         .mockReturnValueOnce('refresh-secret');
       jwtService.verify.mockReturnValue({ sub: 'user-1' });
       redisTokenService.isRefreshTokenValid.mockResolvedValue(true);
-      jwtService.sign.mockReturnValue('new-access-token');
+      redisTokenService.revokeRefreshToken.mockResolvedValue(undefined);
+      redisTokenService.storeRefreshToken.mockResolvedValue(undefined);
+      jwtService.signAsync
+        .mockResolvedValueOnce('new-access-token')
+        .mockResolvedValueOnce('new-refresh-token');
+      configService.get.mockReturnValue('secret');
 
       const result = await authService.refresh('valid-refresh-token');
 
+      expect(redisTokenService.revokeRefreshToken).toHaveBeenCalledWith(
+        'valid-refresh-token',
+      );
       expect(result.accessToken).toBe('new-access-token');
+      expect(result.refreshToken).toBe('new-refresh-token');
     });
 
     it('should throw UnauthorizedException if refresh token expired', async () => {
@@ -230,6 +243,18 @@ describe('AuthService', () => {
 
       await expect(authService.refresh('expired-token')).rejects.toThrow(
         'Refresh token has expired',
+      );
+    });
+
+    it('should throw UnauthorizedException if refresh token revoked', async () => {
+      configService.get
+        .mockReturnValueOnce('access-secret')
+        .mockReturnValueOnce('refresh-secret');
+      jwtService.verify.mockReturnValue({ sub: 'user-1' });
+      redisTokenService.isRefreshTokenValid.mockResolvedValue(false);
+
+      await expect(authService.refresh('revoked-token')).rejects.toThrow(
+        UnauthorizedException,
       );
     });
   });

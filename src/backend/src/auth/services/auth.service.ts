@@ -56,15 +56,11 @@ export class AuthService {
     };
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string): Promise<TokenPair> {
     const accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
-    if (!accessSecret) {
-      throw new Error('JWT_ACCESS_SECRET is not configured');
-    }
-
     const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
-    if (!refreshSecret) {
-      throw new Error('JWT_REFRESH_SECRET is not configured');
+    if (!accessSecret || !refreshSecret) {
+      throw new Error('JWT secrets are not configured');
     }
 
     let payload: RefreshTokenPayload;
@@ -85,15 +81,13 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token has been revoked');
     }
 
-    const accessToken = this.jwtService.sign(
-      { sub: payload.sub },
-      {
-        secret: accessSecret,
-        expiresIn: this.configService.get('JWT_ACCESS_EXPIRATION') ?? '15m',
-      },
-    );
+    // Revoke old refresh token
+    await this.redisTokenService.revokeRefreshToken(refreshToken);
 
-    return { accessToken };
+    // Generate new token pair
+    const newTokens = await this.generateTokens(payload.sub);
+
+    return newTokens;
   }
 
   async logout(refreshToken: string) {

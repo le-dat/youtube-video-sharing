@@ -18,7 +18,7 @@ import { VideosQueueModule } from './videos/queue/videos-queue.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env.dev', '.env'],
     }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

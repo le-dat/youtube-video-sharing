@@ -88,9 +88,12 @@ describe('AuthController', () => {
   });
 
   describe('refresh', () => {
-    it('should refresh token and set new access cookie', async () => {
+    it('should refresh token and set both cookies', async () => {
       const mockRequest = { cookies: { refreshToken: 'valid-refresh' } };
-      mockAuthService.refresh.mockResolvedValue({ accessToken: 'new-access' });
+      mockAuthService.refresh.mockResolvedValue({
+        accessToken: 'new-access',
+        refreshToken: 'new-refresh',
+      });
       mockResponse.cookie = jest.fn();
 
       const result = await controller.refresh(
@@ -102,6 +105,11 @@ describe('AuthController', () => {
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'accessToken',
         'new-access',
+        expect.any(Object),
+      );
+      expect(mockResponse.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'new-refresh',
         expect.any(Object),
       );
       expect(result.message).toBe('Token refreshed');

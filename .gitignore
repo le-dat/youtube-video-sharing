@@ -27,3 +27,4 @@ coverage/
 
 /docs
 CLAUDE.md
+/src/backend/.pnpm-store

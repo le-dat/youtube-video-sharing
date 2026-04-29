@@ -2,7 +2,6 @@ FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Cài đặt pnpm trên Debian-based image
 RUN npm install -g pnpm
 
 COPY package*.json ./

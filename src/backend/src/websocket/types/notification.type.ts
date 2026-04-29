@@ -16,4 +16,16 @@ export interface VoteUpdateNotification {
   downvoteCount: number;
 }
 
-export type Notification = NewVideoNotification | VoteUpdateNotification;
+export interface JobFailedNotification {
+  id: string;
+  type: 'job_failed';
+  jobId: string;
+  jobType: 'video_share';
+  error: string;
+  timestamp: string;
+}
+
+export type Notification =
+  | NewVideoNotification
+  | VoteUpdateNotification
+  | JobFailedNotification;

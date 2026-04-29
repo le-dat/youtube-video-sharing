@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Queue } from 'bullmq';
 import { VideosController } from './videos.controller';
 import { VideosService } from './videos.service';
 import { VoteCountService } from './vote-count.service';
@@ -15,6 +16,7 @@ describe('VideosController', () => {
   let mockVoteCountService: jest.Mocked<VoteCountService>;
   let mockYoutubeService: jest.Mocked<YoutubeService>;
   let mockEventsGateway: jest.Mocked<EventsGateway>;
+  let mockVideoQueue: jest.Mocked<Queue>;
 
   const mockVideo: Video = {
     id: 'video-1',
@@ -62,6 +64,10 @@ describe('VideosController', () => {
       emitVideoUpdate: jest.fn(),
     } as unknown as jest.Mocked<EventsGateway>;
 
+    mockVideoQueue = {
+      add: jest.fn().mockResolvedValue({ id: 'job-123' }),
+    } as unknown as jest.Mocked<Queue>;
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [VideosController],
       providers: [
@@ -69,6 +75,7 @@ describe('VideosController', () => {
         { provide: VoteCountService, useValue: mockVoteCountService },
         { provide: YoutubeService, useValue: mockYoutubeService },
         { provide: EventsGateway, useValue: mockEventsGateway },
+        { provide: 'BullQueue_video-sharing', useValue: mockVideoQueue },
       ],
     }).compile();
 
@@ -177,44 +184,23 @@ describe('VideosController', () => {
   });
 
   describe('share', () => {
-    it('should share a new video and emit websocket event', async () => {
+    it('should enqueue video share job and return accepted', async () => {
       const dto = { youtubeUrl: 'https://www.youtube.com/watch?v=abc123' };
       mockYoutubeService.extractVideoId.mockReturnValue('abc123');
       mockVideosService.findByYoutubeId.mockResolvedValue(null);
-      mockYoutubeService.getVideoDetails.mockResolvedValue({
-        youtubeId: 'abc123',
-        title: 'New Video',
-        description: 'Description',
-        thumbnailUrl: 'https://img.youtube.com/abc123.jpg',
-        duration: 'PT3M',
-        viewCount: 500,
-        likeCount: 0,
-      });
-      mockVideosService.create.mockResolvedValue(mockVideo);
-      mockVideosService.toResponseDto.mockReturnValue({
-        id: 'video-1',
-        youtube_id: 'abc123',
-        title: 'New Video',
-        description: 'Description',
-        thumbnail_url: 'https://img.youtube.com/abc123.jpg',
-        duration: 'PT3M',
-        view_count: 500,
-        upvote_count: 0,
-        downvote_count: 0,
-        user_vote: null,
-        shared_by: { id: 'user-1', username: 'testuser' },
-        created_at: mockVideo.createdAt.toISOString(),
-      });
-      mockEventsGateway.emitNewVideo.mockReturnValue(undefined);
 
       const result = await controller.share(dto, 'user-1');
 
       expect(mockYoutubeService.extractVideoId).toHaveBeenCalledWith(
         dto.youtubeUrl,
       );
-      expect(mockVideosService.create).toHaveBeenCalled();
-      expect(mockEventsGateway.emitNewVideo).toHaveBeenCalled();
-      expect(result.title).toBe('New Video');
+      expect(mockVideoQueue.add).toHaveBeenCalledWith(
+        'share',
+        { youtubeId: 'abc123', userId: 'user-1' },
+        expect.objectContaining({ attempts: 3 }),
+      );
+      expect(result.status).toBe('accepted');
+      expect(result.jobId).toBe('job-123');
     });
 
     it('should throw BadRequestException for invalid YouTube URL', async () => {

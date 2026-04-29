@@ -73,6 +73,35 @@ describe('AuthService', () => {
       ).rejects.toThrow(ConflictException);
     });
 
+    it('should pass plain password to usersService.create (hashing happens in UsersService)', async () => {
+      const plainPassword = 'plainPassword123';
+      let capturedDto: { password: string };
+
+      usersService.create.mockImplementation(async (dto: { password: string }) => {
+        capturedDto = dto;
+        return { id: 'user-1', username: dto.username, email: dto.email } as unknown as User;
+      });
+      usersService.toResponseDto.mockReturnValue({
+        id: 'user-1',
+        username: 'test',
+        email: 'test@example.com',
+      } as UserResponseDto);
+      jwtService.signAsync
+        .mockResolvedValueOnce('access-token')
+        .mockResolvedValueOnce('refresh-token');
+      redisTokenService.storeRefreshToken.mockResolvedValue(undefined);
+      configService.get.mockReturnValue('secret');
+
+      await authService.register({
+        username: 'test',
+        email: 'test@example.com',
+        password: plainPassword,
+      });
+
+      // AuthService passes plain password to UsersService; hashing happens inside UsersService.create
+      expect(capturedDto?.password).toBe(plainPassword);
+    });
+
     it('should create user and return tokens', async () => {
       const mockUser = {
         id: 'user-1',

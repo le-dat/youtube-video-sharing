@@ -141,6 +141,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  emitJobFailed(jobId: string, error: string) {
+    const notification = {
+      id: `notif-${Date.now()}-${crypto.randomUUID()}`,
+      type: 'job_failed' as const,
+      jobId,
+      jobType: 'video_share',
+      error,
+      timestamp: new Date().toISOString(),
+    };
+    this.server.emit(WS_EVENTS.JOB_FAILED, notification);
+  }
+
   getConnectedUsersCount(): number {
     return this.userSockets.size;
   }

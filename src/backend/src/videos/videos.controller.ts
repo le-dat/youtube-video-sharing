@@ -10,6 +10,8 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { VideosService } from './videos.service';
 import { VoteCountService } from './vote-count.service';
 import { YoutubeService } from '../youtube/youtube.service';
@@ -19,6 +21,7 @@ import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { ShareVideoDto, VideoQueryDto } from './dto/video.dto';
 import { VoteType } from './entities/vote.entity';
+import { VideoShareJobData } from './queue/video-processor';
 import {
   ApiTags,
   ApiOperation,
@@ -35,6 +38,8 @@ export class VideosController {
     private readonly voteCountService: VoteCountService,
     private readonly youtubeService: YoutubeService,
     private readonly eventsGateway: EventsGateway,
+    @InjectQueue('video-sharing')
+    private readonly videoQueue: Queue<VideoShareJobData>,
   ) {}
 
   @Public()
@@ -68,7 +73,7 @@ export class VideosController {
   @Post()
   @ApiOperation({ summary: 'Share a YouTube video' })
   @ApiBearerAuth()
-  @ApiResponse({ status: 201, description: 'Video shared successfully' })
+  @ApiResponse({ status: 202, description: 'Video share jo enqueued' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async share(@Body() dto: ShareVideoDto, @CurrentUser('id') userId: string) {
     const videoId = this.youtubeService.extractVideoId(dto.youtubeUrl);
@@ -81,29 +86,24 @@ export class VideosController {
       throw new BadRequestException('This video has already been shared');
     }
 
-    const details = await this.youtubeService.getVideoDetails(videoId);
-    const video = await this.videosService.create({
-      youtubeId: videoId,
-      title: details.title,
-      description: details.description,
-      thumbnailUrl: details.thumbnailUrl,
-      duration: details.duration,
-      viewCount: details.viewCount,
-      sharedById: userId,
-    });
+    const job = await this.videoQueue.add(
+      'share',
+      { youtubeId: videoId, userId },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
+        removeOnFail: true,
+      },
+    );
 
-    const response = this.videosService.toResponseDto(video, null);
-
-    // Notify other clients
-    this.eventsGateway.emitNewVideo({
-      id: video.id,
-      title: video.title,
-      thumbnailUrl: video.thumbnailUrl,
-      sharedBy: { username: video.sharedBy?.username || 'Unknown' },
-      createdAt: video.createdAt,
-    });
-
-    return response;
+    return {
+      status: 'accepted',
+      message: 'Video is being processed',
+      jobId: job.id,
+    };
   }
 
   @UseGuards(JwtAuthGuard)

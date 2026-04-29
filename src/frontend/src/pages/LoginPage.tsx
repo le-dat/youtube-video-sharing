@@ -63,6 +63,7 @@ export function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full px-4 py-3 bg-surface border-3 border-text-primary text-text-primary focus:outline-none focus:border-secondary"
             />
           </div>

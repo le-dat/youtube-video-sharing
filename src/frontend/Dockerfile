@@ -16,7 +16,6 @@ ENV VITE_WS_URL=$VITE_WS_URL
 
 RUN pnpm run build
 
-# Dùng nginx bản chính thức (Debian-based) thay vì alpine để tránh lỗi DNS
 FROM nginx:latest
 
 COPY --from=builder /app/dist /usr/share/nginx/html
